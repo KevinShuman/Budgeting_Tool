@@ -4,7 +4,7 @@ README File
 Budgeting Tool
 
 ## Description
-This is a budgeting tool that allows users to track their personal finances. The user can add bills, expenses, incomes, bank accounts, and transfers between accounts, and the tool will calculate the balances within your bank accounts as well as information about how much you spent and earned in for a given amount of time. There is certainly room to do more with this tool, though Example.py is the way I have envisioned it being used.
+This is a budgeting tool that allows users to track their personal finances. The user can add bills, expenses, incomes, bank accounts, and transfers between accounts, and the tool will calculate the balances within your bank accounts as well as information about how much you spent and earned in for a given amount of time. There is certainly room to do more with this tool, though Example.py is the way I have envisioned it being used. Feel free to jump on a codespace and play around with it!
 
 ## Getting Started
 ### Dependencies
@@ -34,6 +34,12 @@ source <name_you_want_your_env_to_be>/bin/activate
 * To run the program, run the following command in the root directory of the project:
 ```
 python Example.py <start date> <end date>
+```
+
+### For testing the code
+* To run the tests, run the following command in the root directory of the project:
+```
+pytest
 ```
 
 ## Help
