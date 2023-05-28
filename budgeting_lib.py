@@ -9,6 +9,18 @@ from datetime import timedelta
 
 # Define the bill class
 class bill:
+    '''
+        This class creates a bill object.
+
+        Attributes:
+            name (str): The name of the bill object.
+            amount (float): The amount of money the bill object is worth.
+            frequency (str): The frequency at which the bill object is due.
+            duedate (int): The date the bill object is due.
+            ifweekday (bool): Whether or not the bill object is due on the earliest weekday.
+            category (str): The category of the bill object.
+    '''
+
     # Define the initialization function
     def __init__(self, name, amount, frequency, duedate, ifweekday, category):
         '''
@@ -34,21 +46,46 @@ class bill:
     def summary(self):
         '''
         This function returns a summary of the bill object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            summary (str): A summary of the bill object's attributes.
         '''
         if self.ifweekday == True:
-            return f'{self.name} is a {self.category} bill that is due on the {self.duedate}, {self.frequency}, or the earliest week day, and costs ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} bill that is due on the {self.duedate},\
+                     {self.frequency}, or the earliest week day, and costs ${self.amount:.2f}.'
         else:
-            return f'{self.name} is a {self.category} bill that is due on the {self.duedate}, {self.frequency}, and costs ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} bill that is due on the {self.duedate},\
+                     {self.frequency}, and costs ${self.amount:.2f}.'
         
     def attributes(self):
         '''
         This function returns a list of the bill object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            attributes (list): A list of the bill object's attributes.
         '''
         return [self.name, self.amount, self.category, self.frequency, self.duedate, self.ifweekday]
     
     def update(self, name, amount, frequency, duedate, ifweekday, category):
         '''
         This function updates the bill object's attributes.
+
+        Inputs:
+            name (str): The name of the bill object.
+            amount (float): The amount of money the bill object is worth.
+            frequency (str): The frequency at which the bill object is due.
+            duedate (int): The date the bill object is due.
+            ifweekday (bool): Whether or not the bill object is due on the earliest weekday.
+            category (str): The category of the bill object.
+
+        Returns:
+            None
         '''
         self.name = name.lower()
         self.amount = amount
@@ -61,6 +98,13 @@ class bill:
     def amount_spent(self, startdate, enddate):
         '''
         This function calculates the amount of money spent on the bill object in the date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            amount_spent (float): The amount of money spent on the bill object in the date range.
         '''
         # Calculate the number of days in the date range
         num_days = (enddate - startdate).days + 1
@@ -112,18 +156,39 @@ class expense:
     def summary(self):
         '''
         This function returns a summary of the expense object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            summary (str): A summary of the expense object's attributes.
         '''
         return f'{self.name} is a {self.category} expense that costs ${self.amount:.2f} and is described as {self.description}.'
     
     def attributes(self):
         '''
         This function returns a list of the expense object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            attributes (list): A list of the expense object's attributes.
         '''
         return [self.name, self.amount, self.category, self.description]
     
     def update(self, name, amount, category, description):
         '''
         This function updates the expense object's attributes.
+
+        Inputs:
+            name (str): The name of the expense object.
+            amount (float): The amount of money the expense object is worth.
+            category (str): The category of the expense object.
+            description (str): The description of the expense object.
+
+        Returns:
+            None
         '''
         self.name = name.lower()
         self.amount = amount
@@ -132,7 +197,14 @@ class expense:
 
     def amount_left(self, date):
         '''
-        This function calculates the amount of money spent on the expense object so far in the month from a percentage of the month that has passed.
+        This function calculates the amount of money spent on the expense
+        object so far in the month from a percentage of the month that has passed.
+
+        Inputs:
+            date (datetime): The date to calculate the amount of money spent on the expense object so far in the month.
+
+        Returns:
+            amount_spent (float): The amount of money spent on the expense object so far in the month.
         '''
         
         # Create a datetime object for the first day of the month
@@ -158,12 +230,24 @@ class expense:
     
     def amount_spent(self, startdate, enddate):
         '''
-        This function calculates the amount of money spent on the expense object in the date range. Each month gives
-        a different rate per day for the expense object. For each full month in the date range, the amount spent is
-        the total amount of the expense object. For the partial month at the beginning of the date range, the amount
-        spent is the amount spent in the partial month. For the partial month at the end of the date range, the amount
-        spent is the amount spent in the partial month. The amount spent in a partial month is calculated by multiplying
-        the amount of the expense object by the percentage of the month that has passed during the date range.
+        This function calculates the amount of money spent on the expense 
+        object in the date range. Each month gives a different rate per day
+        for the expense object. For each full month in the date range,
+        the amount spent is the total amount of the expense object. For the
+        partial month at the beginning of the date range, the amount
+        spent is the amount spent in the partial month. For the partial
+        month at the end of the date range, the amount spent is the amount
+        spent in the partial month. The amount spent in a partial month is
+        calculated by multiplying the amount of the expense object by the
+        percentage of the month that has passed during the date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            amount_spent (float): The amount of money spent on the expense
+            object in the date range.
         '''
 
         # Determine the number of days in the first month of the date range
@@ -241,9 +325,16 @@ class income:
     def summary(self):
         '''
         This function returns a summary of the income object's attributes.
+
+        Inputs: 
+            None
+
+        Returns:
+            summary (str): A summary of the income object's attributes.
         '''
         if self.ifweekday == True:
-            return f'{self.name} is a {self.category} income that is received {self.frequency}, or the earliest week day, and is worth ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} income that is received {self.frequency}, \
+                                 or the earliest week day, and is worth ${self.amount:.2f}.'
         else:
             return f'{self.name} is a {self.category} income that is received {self.frequency}, and is worth ${self.amount:.2f}.'
         
@@ -251,12 +342,30 @@ class income:
     def attributes(self):
         '''
         This function returns a list of the income object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            [name, amount, frequency, ifweekday, category, startdate, enddate] (list): A list of the income object's attributes.
         '''
         return [self.name, self.amount, self.frequency, self.ifweekday, self.category, self.startdate, self.enddate]
     
     def update(self, name, amount, frequency, ifweekday, category, startdate, enddate):
         '''
         This function updates the income object's attributes.
+
+        Inputs:
+            name (str): The name of the income object.
+            amount (float): The amount of money the income object is worth.
+            frequency (str): The frequency at which the income object is received.
+            ifweekday (bool): Whether or not the income object is received on the earliest weekday.
+            category (str): The category of the income object.
+            startdate (datetime): The date the income object starts.
+            enddate (datetime): The date the income object ends.
+
+        Returns:
+            None
         '''
         self.name = name.lower()
         self.amount = amount
@@ -268,7 +377,14 @@ class income:
 
     def amount_earned_month(self, date):
         '''
-        This function calculates the amount of money received from the income object so far in the month from a percentage of the month that has passed.
+        This function calculates the amount of money received from the income
+        object so far in the month from a percentage of the month that has passed.
+
+        Inputs:
+            date (datetime): The date to calculate the amount of money received from the income object so far in the month.
+
+        Returns:
+            amount_received (float): The amount of money received from the income object so far in the month.
         '''
         
         # Create a datetime object for the first day of the month
@@ -297,9 +413,12 @@ class income:
         This function returns the amount of money earned on the income object in the date range.
         This looks for how many times the amount is paid in a given date range and multiplies that by the amount.
 
-        Attributes:
+        Inputs:
             startdate (datetime): The date the date range starts.
             enddate (datetime): The date the date range ends.
+
+        Returns:
+            amount_earned (float): The amount of money earned on the income object in the date range.
         '''
 
         # The income start date and the income frequency
@@ -319,7 +438,8 @@ class income:
             income_dates = [income_start_date + dt.timedelta(days=x) for x in range((enddate - income_start_date).days + 1) if x % 14 == 0]
         elif income_frequency == 'monthly':
             # If the income is monthly, then the income is paid every month
-            income_dates = [income_start_date + relativedelta(months=x) for x in range(0, (enddate.year - income_start_date.year) * 12 + (enddate.month - income_start_date.month) + 1)]
+            income_dates = [income_start_date + relativedelta(months=x) for x in range(0, (enddate.year - income_start_date.year) \
+                                                                                       * 12 + (enddate.month - income_start_date.month) + 1)]
         elif income_frequency == 'yearly':
             # If the income is yearly, then the income is paid every year
             income_dates = [income_start_date + relativedelta(years=x) for x in range(0, enddate.year - income_start_date.year + 1)]
@@ -360,6 +480,12 @@ class account:
     def summary(self):
         '''
         This function returns a summary of the account object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            account_summary (str): The summary of the account object's attributes.
         '''
         
         # Creates string for the account object's attributes
@@ -386,6 +512,12 @@ class account:
     def attributes(self):
         '''
         This function returns a list of the account object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            attributes (list): A list of the account object's attributes.
         '''
         return [self.name, self.type, self.balance, self.bills, self.expenses, self.incomes]
     
@@ -393,6 +525,17 @@ class account:
     def update(self, name, type, balance, bills, expenses, incomes):
         '''
         This function updates the account object's attributes.
+
+        Inputs:
+            name (str): The name of the account object.
+            type (str): The type of the account object.
+            balance (float): The balance of the account object.
+            bills (list): The list of bill objects of the account object.
+            expenses (list): The list of expense objects of the account object.
+            incomes (list): The list of income objects of the account object.
+
+        Returns:
+            None
         '''
         self.name = name.lower()
         self.type = type
@@ -405,6 +548,13 @@ class account:
     def total_bills(self, startdate, enddate):
         '''
         This function calculates the total amount of money spent on bills in a date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            total_spent (float): The total amount of money spent on bills in the date range.
         '''
         # Initialize the total amount spent on bills to 0
         total_spent = 0
@@ -421,6 +571,13 @@ class account:
     def total_expenses(self, startdate, enddate):
         '''
         This function calculates the total amount of money spent on expenses in a date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            total_spent (float): The total amount of money spent on expenses in the date range.
         '''
         # Initialize the total amount spent on expenses to 0
         total_spent = 0
@@ -437,6 +594,13 @@ class account:
     def total_incomes(self, startdate, enddate):
         '''
         This function calculates the total amount of money received from incomes in a date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            total_received (float): The total amount of money received from incomes in the date range.
         '''
         # Initialize the total amount received from incomes to 0
         total_received = 0
@@ -453,6 +617,13 @@ class account:
     def pay_bills(self, startdate, enddate):
         '''
         This function pays all the bills in the account object in a date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            None
         '''
         # Iterate through each bill object in the account object and determine the total amount spent on the bill object in the date range
         for bill in self.bills:
@@ -466,6 +637,13 @@ class account:
     def pay_expenses(self, startdate, enddate):
         '''
         This function pays all the expenses in the account object in a date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            None
         '''
         # Iterate through each expense object in the account object and determine the total amount spent on the expense object in the date range
         for expense in self.expenses:
@@ -479,6 +657,13 @@ class account:
     def receive_incomes(self, startdate, enddate):
         '''
         This function receives all the incomes in the account object in a date range.
+
+        Inputs:
+            startdate (datetime): The start date of the date range.
+            enddate (datetime): The end date of the date range.
+
+        Returns:
+            None
         '''
         # Iterate through each income object in the account object and determine the total amount received from the income object in the date range
         for income in self.incomes:
@@ -518,9 +703,16 @@ class transfer:
     def summary(self):
         '''
         This function returns a string of the transfer object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            transfer_summary (str): A string of the transfer object's attributes.
         '''
         # Creates string for the transfer object's attributes
-        transfer_summary = f'Transfer Name: {self.name}\nTransfer Amount: ${self.amount:.2f}\nTransfer Frequency: {self.frequency}\nTransfer From: {self.from_account.name}\nTransfer To: {self.to_account.name}\n'
+        transfer_summary = f'Transfer Name: {self.name}\nTransfer Amount: ${self.amount:.2f}\nTransfer Frequency: \
+                                            {self.frequency}\nTransfer From: {self.from_account.name}\nTransfer To: {self.to_account.name}\n'
 
         # Returns the transfer_summary string
         return transfer_summary
@@ -529,6 +721,18 @@ class transfer:
     def update(self, name, amount, startdate, enddate, frequency, from_account, to_account):
         '''
         This function updates the transfer object's attributes.
+
+        Attributes:
+            name (str): The name of the transfer object.
+            startdate (datetime): The date of the transfer object.
+            enddate (datetime): The date of the transfer object.
+            amount (float): The amount of the transfer object.
+            frequency (str): The frequency of the transfer object.
+            from_account (account): The account object the transfer object is from.
+            to_account (account): The account object the transfer object is to.
+
+        Returns:
+            None
         '''
         self.name = name.lower()
         self.amount = amount
@@ -543,6 +747,12 @@ class transfer:
         '''
         This function transfers money from one account object to another account object in a date range.
         It uses the account update function to update the account objects' balances. 
+
+        Inputs:
+            None
+
+        Returns:
+            None
         '''
 
         # Uses the transfer amount to update the from_account object's balance
@@ -585,9 +795,14 @@ class budget:
     def summary(self):
         '''
         This function returns a string of the budget object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            budget_summary (str): The string of the budget object's attributes.
         '''
         # Creates string for the budget object's attributes
-        # f"Budget:             {budget.name}\nStart Date: {budget.startdate}\nEnd Date: {budget.enddate}\nAccounts:\n{account1.summary()}\n{account2.summary()}"
         budget_summary = f'Budget: {self.name}\nStart Date: {self.startdate}\nEnd Date: {self.enddate}\nAccounts:\n'
 
         # Iterate through each account object in the budget object
@@ -606,6 +821,12 @@ class budget:
     def attributes(self):
         '''
         This function returns a list of the budget object's attributes.
+
+        Inputs:
+            None
+        
+        Returns:
+            budget_attributes (list): The list of the budget object's attributes.
         '''
         # Creates list for the budget object's attributes
         budget_attributes = [self.name, self.startdate, self.enddate]
@@ -626,6 +847,15 @@ class budget:
     def update(self, name, startdate, enddate, accounts):
         '''
         This function updates the budget object's attributes.
+
+        Attributes:
+            name (str): The name of the budget object.
+            startdate (datetime): The date of the budget object.
+            enddate (datetime): The date of the budget object.
+            account (list): The list of account objects the budget object is for.
+
+        Returns:    
+            None
         '''
         self.name = name.lower()
         self.startdate = startdate
@@ -636,6 +866,12 @@ class budget:
     def total_spent(self):
         '''
         This function returns the total amount spent in the budget object in a date range.
+
+        Inputs:
+            None
+
+        Returns:
+            total_spent (float): The total amount spent in the budget object in a date range.
         '''
         # Initialize the total_spent variable
         total_spent = 0
@@ -653,6 +889,12 @@ class budget:
     def total_earned(self):
         '''
         This function returns the total amount earned in the budget object in a date range.
+
+        Inputs:
+            None
+
+        Returns:
+            total_earned (float): The total amount earned in the budget object in a date range.
         '''
         # Initialize the total_earned variable
         total_earned = 0
@@ -670,6 +912,12 @@ class budget:
         '''
         This function tests the budget class's regular transfer function. That is, it uses the start transfer date
         and then transfers the amount every frequency until the end transfer date.
+
+        Inputs:
+            transfer (transfer): The transfer object to be tested.
+
+        Returns:    
+            None
         '''
 
         # Initialize the current date variable
@@ -694,6 +942,12 @@ class budget:
     def total_balance(self):
         '''
         This function returns the total balance of the budget object at the end date.
+
+        Inputs:
+            None
+
+        Returns:
+            total_balance (float): The total balance of the budget object at the end date.
         '''
         # Initialize the total_balance variable
         total_balance = 0
@@ -709,7 +963,15 @@ class budget:
     # Define the summary_final function
     def summary_final(self):
         '''
-        This function returns a string of the budget object's attributes at the end date.
+        This function returns a summary of the total spent, total earned, 
+        and total balance of the budget object as well as the balances of
+        each account object.
+
+        Inputs:
+            None
+
+        Returns:
+            budget_summary (str): The summary of the budget object.        
         '''
 
         account_summary = ''
@@ -729,7 +991,8 @@ class budget:
 
         # Creates string for the budget object's attributes
         # "Total spent: ${:.2f}\nTotal earned: ${:.2f}\nTotal balance: ${:.2f}\nAccount balances:\n\t{}: ${:.2f}\n\t{}: ${:.2f}\n".format(expected_total_spent, expected_total_earned, expected_total_balance, account1.name, account1.balance, account2.name, account2.balance)
-        budget_summary = f'Total spent: ${self.total_spent():.2f}\nTotal earned: ${self.total_earned():.2f}\nTotal balance: ${self.total_balance()+self.total_earned()-self.total_spent():.2f}\nAccount balances:\n' + account_summary
+        budget_summary = f'Total spent: ${self.total_spent():.2f}\nTotal earned: ${self.total_earned():.2f}\nTotal balance: \
+                                        ${self.total_balance()+self.total_earned()-self.total_spent():.2f}\nAccount balances:\n' + account_summary
 
 
         # Returns the budget_summary string

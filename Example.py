@@ -5,6 +5,8 @@ import budgeting_lib as bl
 import datetime as dt
 
 # Create bills, expenses, and incomes
+
+# A bill has a name, amount, duedate, frequency, category, and ifweekday
 bills = [   
             bl.bill(name="rent", amount=1000.00, duedate=1, frequency="monthly", category="housing", ifweekday=True),
             bl.bill(name="phone", amount=79.99, duedate=1, frequency="monthly", category="utilities", ifweekday=True),
@@ -19,17 +21,20 @@ bills = [
             bl.bill(name="lightroom", amount=9.99, duedate=20, frequency="monthly", category="hobbies", ifweekday=True),
 ]
 
+# An expense has a name, amount, category, and description
 expenses = [
                 bl.expense(name="groceries", amount=200.00, category="food", description="groceries for two weeks"),
                 bl.expense(name="gas", amount=50.00, category="car", description="gas for car"),
                 bl.expense(name="eating out", amount=100.00, category="food", description="eating out with friends"),
 ]
 
+# An income has a name, amount, frequency, category, startdate, enddate, and ifweekday
 incomes = [
                 bl.income(name="paycheck", amount=3000.00, frequency="biweekly", category="income", startdate=dt.date(2023, 1, 1), enddate=dt.date(2023, 12, 31), ifweekday=True)
 ]
 
 # Create three accounts
+# An account has a name, type, balance, bills, expenses, and incomes
 accounts = [
                 bl.account(name="checking", type="checking", balance=1000.00, bills=bills, expenses=expenses, incomes=incomes),
                 bl.account(name="savings", type="savings", balance=10000.00, bills=[], expenses=[], incomes=[]),
@@ -41,12 +46,14 @@ checking_account = accounts[0]
 saving_account = accounts[1]
 travel_account = accounts[2]
 
+# A transfer has a name, startdate, enddate, amount, frequency, from_account, and to_account
 transfers = [
                 bl.transfer(name="savings", startdate=dt.date(2023, 1, 1), enddate=dt.date(2023, 12, 31), amount=300.00, frequency="biweekly", from_account=checking_account, to_account=saving_account),
                 bl.transfer(name="travel", startdate=dt.date(2023, 1, 1), enddate=dt.date(2023, 12, 31), amount=100.00, frequency="biweekly", from_account=checking_account, to_account=travel_account),
 ]
 
 # Create a budget
+# A budget has a name, startdate, enddate, accounts, and transfers
 budget = bl.budget(name="yearly budget", startdate=dt.date(2023, 1, 1), enddate=dt.date(2023, 12, 31), accounts=accounts, transfers=transfers)
 
 # Print the summary of the budget
