@@ -3,7 +3,11 @@ import datetime as dt
 import math
 import os, sys, inspect
 
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+currentframe = inspect.currentframe()
+if currentframe is not None:
+    currentdir = os.path.dirname(os.path.abspath(inspect.getfile(currentframe)))
+else:
+    currentdir = os.path.dirname(os.path.abspath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 
