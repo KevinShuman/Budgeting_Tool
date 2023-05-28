@@ -54,11 +54,9 @@ class bill:
             summary (str): A summary of the bill object's attributes.
         '''
         if self.ifweekday == True:
-            return f'{self.name} is a {self.category} bill that is due on the {self.duedate},\
-                     {self.frequency}, or the earliest week day, and costs ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} bill that is due on the {self.duedate}, {self.frequency}, or the earliest week day, and costs ${self.amount:.2f}.'
         else:
-            return f'{self.name} is a {self.category} bill that is due on the {self.duedate},\
-                     {self.frequency}, and costs ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} bill that is due on the {self.duedate}, {self.frequency}, and costs ${self.amount:.2f}.'
         
     def attributes(self):
         '''
@@ -333,8 +331,7 @@ class income:
             summary (str): A summary of the income object's attributes.
         '''
         if self.ifweekday == True:
-            return f'{self.name} is a {self.category} income that is received {self.frequency}, \
-                                 or the earliest week day, and is worth ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} income that is received {self.frequency}, or the earliest week day, and is worth ${self.amount:.2f}.'
         else:
             return f'{self.name} is a {self.category} income that is received {self.frequency}, and is worth ${self.amount:.2f}.'
         
@@ -711,8 +708,7 @@ class transfer:
             transfer_summary (str): A string of the transfer object's attributes.
         '''
         # Creates string for the transfer object's attributes
-        transfer_summary = f'Transfer Name: {self.name}\nTransfer Amount: ${self.amount:.2f}\nTransfer Frequency: \
-                                            {self.frequency}\nTransfer From: {self.from_account.name}\nTransfer To: {self.to_account.name}\n'
+        transfer_summary = f'Transfer Name: {self.name}\nTransfer Amount: ${self.amount:.2f}\nTransfer Frequency: {self.frequency}\nTransfer From: {self.from_account.name}\nTransfer To: {self.to_account.name}\n'
 
         # Returns the transfer_summary string
         return transfer_summary
@@ -790,6 +786,15 @@ class budget:
         self.enddate = enddate
         self.accounts = accounts
         self.transfers = transfers
+
+        # We need to update the income objects' enddate to the budget object's enddate
+        for account in self.accounts:
+            for income in account.incomes:
+                income.enddate = enddate
+
+        # We need to update the transfer objects' enddate to the budget object's enddate
+        for transfer in self.transfers:
+            transfer.enddate = enddate
 
     # Define the summary function
     def summary(self):
@@ -991,8 +996,7 @@ class budget:
 
         # Creates string for the budget object's attributes
         # "Total spent: ${:.2f}\nTotal earned: ${:.2f}\nTotal balance: ${:.2f}\nAccount balances:\n\t{}: ${:.2f}\n\t{}: ${:.2f}\n".format(expected_total_spent, expected_total_earned, expected_total_balance, account1.name, account1.balance, account2.name, account2.balance)
-        budget_summary = f'Total spent: ${self.total_spent():.2f}\nTotal earned: ${self.total_earned():.2f}\nTotal balance: \
-                                        ${self.total_balance()+self.total_earned()-self.total_spent():.2f}\nAccount balances:\n' + account_summary
+        budget_summary = f'Total spent: ${self.total_spent():.2f}\nTotal earned: ${self.total_earned():.2f}\nTotal balance: ${self.total_balance()+self.total_earned()-self.total_spent():.2f}\nAccount balances:\n' + account_summary
 
 
         # Returns the budget_summary string
