@@ -26,6 +26,7 @@ import budgeting_lib as bl
 # 2. The income class should be able to return a summary of the income object's attributes
 # 3. The income class should be able to return the attributes of the income object
 # 4. The income class should be able to update the attributes of the income object
+# 5. The income class should be able to return the amount of income received between two dates
 
 # Start with the income class using pytest
 # Start with test number 1: The income class should be able to create an income object with the needed attributes
@@ -34,7 +35,7 @@ def test_income():
     date1 = dt.date(2020, 10, 15)
     date2 = dt.date(2021, 2, 17)
 
-    income = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2)
+    income = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10)
     assert income.name == "paycheck"
     assert income.amount == 1000.00
     assert income.frequency == "weekly"
@@ -50,10 +51,10 @@ def test_income_summary():
     date1 = dt.date(2020, 10, 15)
     date2 = dt.date(2021, 2, 17)
 
-    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2)
-    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)
-    assert income_Paycheck.summary() == "paycheck is a work income that is received weekly, or the earliest week day, and is worth $1000.00."
-    assert income_Bonus.summary() == "bonus is a work income that is received monthly, and is worth $500.00."
+    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10)
+    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)
+    assert income_Paycheck.summary() == "paycheck is a work income that is received weekly on the 10 of the month, or the earliest week day, and is worth $1000.00."
+    assert income_Bonus.summary() == "bonus is a work income that is received monthly on the 10 of the month, and is worth $500.00."
 
 
 # Test number 3: The income class should be able to return the attributes of the income object
@@ -62,10 +63,10 @@ def test_income_attributes():
     date1 = dt.date(2020, 10, 15)
     date2 = dt.date(2021, 2, 17)
 
-    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2)
-    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)
-    assert income_Paycheck.attributes() == ["paycheck", 1000.00, "weekly", True, "work", date1, date2]
-    assert income_Bonus.attributes() == ["bonus", 500.00, "monthly", False, "work", date1, date2]
+    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10)
+    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)
+    assert income_Paycheck.attributes() == ["paycheck", 1000.00, "weekly", True, "work", date1, date2, 10]
+    assert income_Bonus.attributes() == ["bonus", 500.00, "monthly", False, "work", date1, date2, 10]
 
 
 # Test number 4: The income class should be able to update the attributes of the income object
@@ -74,44 +75,33 @@ def test_income_update():
     date1 = dt.date(2020, 10, 15)
     date2 = dt.date(2021, 2, 17)
 
-    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2)
-    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)
-    income_Paycheck.update(name="Paycheck", amount=1500.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2)
-    income_Bonus.update(name="Bonus", amount=750.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)
-    assert income_Paycheck.attributes() == ["paycheck", 1500.00, "weekly", True, "work", date1, date2]
-    assert income_Bonus.attributes() == ["bonus", 750.00, "monthly", False, "work", date1, date2]
+    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10)
+    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)
+    income_Paycheck.update(name="Paycheck", amount=1500.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10)
+    income_Bonus.update(name="Bonus", amount=750.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)
+    assert income_Paycheck.attributes() == ["paycheck", 1500.00, "weekly", True, "work", date1, date2, 10]
+    assert income_Bonus.attributes() == ["bonus", 750.00, "monthly", False, "work", date1, date2, 10]
 
 
-# Test number 5: The income class should be able to return the amount of income received for a given date of the month
+# Test number 5: The income class should be able to return the amount of income received between two dates
 def test_income_amount():
     # Create date object for the 15th of October 2020 and for the 17th of February 2021
-    date1 = dt.date(2020, 10, 15)
+    date1 = dt.date(2020, 10, 10)
     date2 = dt.date(2021, 2, 17)
 
-    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2)
-    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)
+    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10)
+    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)
 
-    # The amount received on the 15th of October 2020 for the income_Paycheck object should be a percentage of the amount of days passed for the month of October
-    amount1 = 1000.00 * (15.0 / 31.0)
-    assert income_Paycheck.amount_earned_month(date1) == amount1
+    # The amount received between the 10th of October 2020 and the 17th of February 2021 for the income_Paycheck object should be
+    # the number of times the income is paid between the two dates multiplied by the amount of the income. The number of times the
+    # income is paid is determined by starting on the 10th of the month and adding the frequency to the date until the end date is
+    # reached.
+    amount1 = 1000.00 * 18
+    assert income_Paycheck.amount_earned() == amount1
 
-    # The amount received on the 17th of February 2021 for the income_Bonus object should be a percentage of the amount of days passed for the month of February
-    amount2 = 500.00 * (17.0 / 28.0)
-    assert income_Bonus.amount_earned_month(date2) == amount2
-
-# Test number 6: The income class should be able to return the amount of income received between two dates
-def test_income_amount_between_dates():
-    # Create date object for the 15th of October 2020 and for the 17th of February 2021
-    date1 = dt.date(2020, 10, 15)
-    date2 = dt.date(2021, 2, 17)
-
-    income_Paycheck = bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2)
-    income_Bonus = bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)
-
-    # The amount received between the 15th of October 2020 and the 17th of February 2021 for the income_Paycheck object should be a percentage of the amount of days passed for the month of October, November, December, January, and February
-    amount1 = 1000.00 * 18.0
-    assert income_Paycheck.amount_earned_diff(date1, date2) == amount1
-
-    # The amount received between the 15th of October 2020 and the 17th of February 2021 for the income_Bonus object should be a percentage of the amount of days passed for the month of October, November, December, January, and February
+    # The amount received between the 10th of October 2020 and the 17th of February 2021 for the income_Bonus object should be
+    # the number of times the income is paid between the two dates multiplied by the amount of the income. The number of times the
+    # income is paid is determined by starting on the 10th of the month and adding the frequency to the date until the end date is
+    # reached.
     amount2 = 500.00 * 5
-    assert income_Bonus.amount_earned_diff(date1, date2) == amount2
+    assert income_Bonus.amount_earned() == amount2

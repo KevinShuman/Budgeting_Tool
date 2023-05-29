@@ -43,8 +43,8 @@ def bills_expenses_incomes():
     expenses = [bl.expense(name="Groceries", amount=100.00, category="Food", description="Groceries for the week"),
                 bl.expense(name="Gas", amount=50.00, category="Transportation", description="Gas for the car")]
     
-    incomes = [bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2),
-                bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)]
+    incomes = [bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10),
+                bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)]
     
     return bills, expenses, incomes
 
@@ -69,7 +69,7 @@ def test_transfer_create(transfer):
     account1, account2, date1, date2 = transfer
 
     # Create the transfer object
-    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, frequency="weekly", from_account=account1, to_account=account2)
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
 
     assert transfer.name == "transfer"
     assert transfer.amount == 1000.00
@@ -84,7 +84,7 @@ def test_transfer_summary(transfer):
     account1, account2, date1, date2 = transfer
 
     # Create the transfer object
-    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, frequency="weekly", from_account=account1, to_account=account2)
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
 
     # Create the summary
     summary = transfer.summary()
@@ -93,12 +93,26 @@ def test_transfer_summary(transfer):
     summary_expected = f'Transfer Name: transfer\nTransfer Amount: $1000.00\nTransfer Frequency: weekly\nTransfer From: chequing\nTransfer To: savings\n'
     assert summary == summary_expected
 
-# Test number 3: The transfer class should be able to update the attributes of the transfer object
+# Test number 3: The transfer class should be able to return the attributes of the transfer object
+def test_transfer_attributes(transfer):
+    account1, account2, date1, date2 = transfer
+
+    # Create the transfer object
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
+
+    # Create the attributes
+    attributes = transfer.attributes()
+
+    # Assert that the list attributes are correct
+    attributes_expected = ["transfer", 1000.00, date1, date2, 20, "weekly", account1, account2]
+    assert attributes == attributes_expected
+
+# Test number 4: The transfer class should be able to update the attributes of the transfer object
 def test_transfer_update(transfer):
     account1, account2, date1, date2 = transfer
 
     # Create the transfer object
-    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, frequency="weekly", from_account=account1, to_account=account2)
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
 
     # Update the attributes of the transfer object
     transfer.name = "new transfer"
@@ -118,12 +132,12 @@ def test_transfer_update(transfer):
     assert transfer.from_account == account2
     assert transfer.to_account == account1
 
-# Test number 4: The transfer class should be able to transfer money from one account to another regularly
+# Test number 5: The transfer class should be able to transfer money from one account to another
 def test_transfer_transfer(transfer):
     account1, account2, date1, date2 = transfer
 
     # Create the transfer object
-    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, frequency="weekly", from_account=account1, to_account=account2)
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
 
     # Transfer the money
     transfer.transfer()

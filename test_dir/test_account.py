@@ -35,7 +35,7 @@ import budgeting_lib as bl
 @pytest.fixture(scope="function")
 def bills_expenses_incomes():
     # Create date object for the 15th of October 2020 and for the 17th of February 2021
-    date1 = dt.date(2020, 10, 15)
+    date1 = dt.date(2020, 10, 10)
     date2 = dt.date(2021, 2, 17)
 
     # Create a list of three bills, a list of two incomes, and a list of 2 expenses
@@ -46,8 +46,8 @@ def bills_expenses_incomes():
     expenses = [bl.expense(name="Groceries", amount=100.00, category="Food", description="Groceries for the week"),
                 bl.expense(name="Gas", amount=50.00, category="Transportation", description="Gas for the car")]
     
-    incomes = [bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2),
-                bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)]
+    incomes = [bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10),
+                bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)]
     
     return bills, expenses, incomes
 
@@ -94,7 +94,7 @@ def test_account_total(bills_expenses_incomes):
     account = bl.account(name="chequing", type="checking", balance=20000.00, bills=bills, expenses=expenses, incomes=incomes)
 
     # Create date object for the 15th of October 2020 and for the 17th of February 2021
-    date1 = dt.date(2020, 10, 15)
+    date1 = dt.date(2020, 10, 10)
     date2 = dt.date(2021, 2, 17)
 
     # The total amount of bills for the date range should be the total per month for the months of November, December, January, and February, since the bills are due on the 1st of the month
@@ -110,7 +110,7 @@ def test_account_total(bills_expenses_incomes):
     # beginning of the month to the 2/17/2021 divided by the total number of days in the month. The total amount of expenses for the months of
     # November, December, and January is the total amount of expenses for the month. The total amount of expenses for the date range is the sum
     # of the total amount of expenses for each month
-    expenses_expected = (16/31) * (100.00 + 50.00) + 3.0*(150.00) + (17/28) * (100.00 +50.00)
+    expenses_expected = (21/31) * (100.00 + 50.00) + 3.0*(150.00) + (17/28) * (100.00 +50.00)
 
     # Assert that these number are close enough to each other
     assert math.isclose(account.total_expenses(date1, date2), expenses_expected)
@@ -134,7 +134,7 @@ def test_account_pay(bills_expenses_incomes):
     account = bl.account(name="chequing", type="checking", balance=20000.00, bills=bills, expenses=expenses, incomes=incomes)
 
     # Create date object for the 15th of October 2020 and for the 17th of February 2021
-    date1 = dt.date(2020, 10, 15)
+    date1 = dt.date(2020, 10, 10)
     date2 = dt.date(2021, 2, 17)
 
     # Pay the bills for the date range
@@ -148,12 +148,12 @@ def test_account_pay(bills_expenses_incomes):
     account.pay_expenses(date1, date2)
 
     # The expenses are paid on the 15th of each month. Therefore, the balance should be reduced by the total amount of expenses for the date range
-    account_expected = account_expected - (16/31) * (100.00 + 50.00) - 3.0*(150.00) - (17/28) * (100.00 +50.00)
+    account_expected = account_expected - (21/31) * (100.00 + 50.00) - 3.0*(150.00) - (17/28) * (100.00 +50.00)
     # Assert that these number are close enough to each other
     assert math.isclose(account.balance, account_expected)
 
     # Pay the incomes for the date range
-    account.receive_incomes(date1, date2)
+    account.receive_incomes()
 
     # The incomes are paid on the 15th of each month. Therefore, the balance should be increased by the total amount of incomes for the date range
     account_expected = account_expected + 18 * 1000.00 + 5 * 500.00

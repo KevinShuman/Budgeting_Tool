@@ -33,7 +33,7 @@ import budgeting_lib as bl
 @pytest.fixture(scope="function")
 def bills_expenses_incomes():
     # Create date object for the 15th of October 2020 and for the 17th of February 2021
-    date1 = dt.date(2020, 10, 15)
+    date1 = dt.date(2020, 10, 10)
     date2 = dt.date(2021, 2, 17)
 
     # Create a list of three bills, a list of two incomes, and a list of 2 expenses
@@ -44,8 +44,8 @@ def bills_expenses_incomes():
     expenses = [bl.expense(name="Groceries", amount=100.00, category="Food", description="Groceries for the week"),
                 bl.expense(name="Gas", amount=50.00, category="Transportation", description="Gas for the car")]
     
-    incomes = [bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2),
-                bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2)]
+    incomes = [bl.income(name="Paycheck", amount=1000.00, frequency="Weekly", ifweekday=True, category="Work", startdate=date1, enddate=date2, payday=10),
+                bl.income(name="Bonus", amount=500.00, frequency="Monthly", ifweekday=False, category="Work", startdate=date1, enddate=date2, payday=10)]
     
     return bills, expenses, incomes
 
@@ -55,7 +55,7 @@ def budget(bills_expenses_incomes):
     bills, expenses, incomes = bills_expenses_incomes
 
     # Create date object for the 15th of October 2020 and for the 17th of February 2021
-    date1 = dt.date(2020, 10, 15)
+    date1 = dt.date(2020, 10, 10)
     date2 = dt.date(2021, 2, 17)
 
     # Create the 2 account objects
@@ -135,7 +135,7 @@ def test_budget_total_spent(budget):
     # Calculate the expected total amount of money spent for a given period of time by adding the total amount
     # spent from the bills and expenses of each account
     bills_expected = 4 * (100.00 + 50.00 + 75.00)
-    expenses_expected = (16/31) * (100.00 + 50.00) + 3.0*(150.00) + (17/28) * (100.00 +50.00)
+    expenses_expected = (21/31) * (100.00 + 50.00) + 3.0*(150.00) + (17/28) * (100.00 +50.00)
 
     acount1_total_spent =  bills_expected + expenses_expected
     acount2_total_spent =  bills_expected + expenses_expected
@@ -168,11 +168,11 @@ def test_budget_total_earned(budget):
     assert math.isclose(budget.total_earned(), expected_total_earned, rel_tol=1e-09, abs_tol=0.0)
 
 # Test 7: The budget class should be able to transfer money from one account to another regularly
-def test_budget_regular_transfer(budget):
+def test_budget_reaccuring_transfer(budget):
     account1, account2, date1, date2 = budget
 
     # Create a transfer object
-    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, frequency="weekly", from_account=account1, to_account=account2)
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
 
     # Original account balances
     account1_balance = account1.balance
@@ -182,7 +182,9 @@ def test_budget_regular_transfer(budget):
     budget = bl.budget(name="test budget", startdate=date1, enddate=date2, accounts=[account1, account2], transfers=[transfer])
 
     # Create a regular transfer from account1 to account2
-    budget.regular_transfer(transfer=transfer)
+    deposit_days = transfer.reaccuring_transfer()
+
+    print(deposit_days)
 
     # Check that the account balances are updated correctly for the number of transfers that have occurred for the given period of time
     expected_balance1 = account1_balance - 1000.00 * 18
@@ -195,7 +197,7 @@ def test_budget_total_balance(budget):
     account1, account2, date1, date2 = budget
 
     # Create a transfer object
-    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, frequency="weekly", from_account=account1, to_account=account2)
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
 
     # Create a budget object
     budget = bl.budget(name="test budget", startdate=date1, enddate=date2, accounts=[account1, account2], transfers=[transfer])
@@ -212,7 +214,7 @@ def test_budget_summary_final(budget):
     account1, account2, date1, date2 = budget
 
     # Create a transfer object
-    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, frequency="weekly", from_account=account1, to_account=account2)
+    transfer = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
 
     # Create a budget object
     budget = bl.budget(name="test budget", startdate=date1, enddate=date2, accounts=[account1, account2], transfers=[transfer])
@@ -224,7 +226,7 @@ def test_budget_summary_final(budget):
     # Calculate the expected total amount of money spent for a given period of time by adding the total amount
     # spent from the bills and expenses of each account
     bills_expected = 4 * (100.00 + 50.00 + 75.00)
-    expenses_expected = (16/31) * (100.00 + 50.00) + 3.0*(150.00) + (17/28) * (100.00 +50.00)
+    expenses_expected = (21/31) * (100.00 + 50.00) + 3.0*(150.00) + (17/28) * (100.00 +50.00)
 
     acount1_total_spent =  bills_expected + expenses_expected
     acount2_total_spent =  bills_expected + expenses_expected

@@ -297,7 +297,7 @@ class expense:
 # Define the income class
 class income:
     # Define the initialization function
-    def __init__(self, name, amount, frequency, ifweekday, category, startdate, enddate):
+    def __init__(self, name, amount, frequency, ifweekday, category, startdate, enddate, payday):
         '''
             This function initializes the income object's attributes.
 
@@ -309,6 +309,7 @@ class income:
                 category (str): The category of the income object.
                 startdate (datetime): The date the income object starts.
                 enddate (datetime): The date the income object ends.
+                payday (int): The day of the month the income object is received.
         '''
 
         self.name = name.lower()
@@ -318,6 +319,7 @@ class income:
         self.category = category.lower()
         self.startdate = startdate
         self.enddate = enddate
+        self.payday = payday
 
     # Define the summary function
     def summary(self):
@@ -331,9 +333,9 @@ class income:
             summary (str): A summary of the income object's attributes.
         '''
         if self.ifweekday == True:
-            return f'{self.name} is a {self.category} income that is received {self.frequency}, or the earliest week day, and is worth ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} income that is received {self.frequency} on the {self.payday} of the month, or the earliest week day, and is worth ${self.amount:.2f}.'
         else:
-            return f'{self.name} is a {self.category} income that is received {self.frequency}, and is worth ${self.amount:.2f}.'
+            return f'{self.name} is a {self.category} income that is received {self.frequency} on the {self.payday} of the month, and is worth ${self.amount:.2f}.'
         
 
     def attributes(self):
@@ -346,9 +348,9 @@ class income:
         Returns:
             [name, amount, frequency, ifweekday, category, startdate, enddate] (list): A list of the income object's attributes.
         '''
-        return [self.name, self.amount, self.frequency, self.ifweekday, self.category, self.startdate, self.enddate]
+        return [self.name, self.amount, self.frequency, self.ifweekday, self.category, self.startdate, self.enddate, self.payday]
     
-    def update(self, name, amount, frequency, ifweekday, category, startdate, enddate):
+    def update(self, name, amount, frequency, ifweekday, category, startdate, enddate, payday):
         '''
         This function updates the income object's attributes.
 
@@ -360,6 +362,7 @@ class income:
             category (str): The category of the income object.
             startdate (datetime): The date the income object starts.
             enddate (datetime): The date the income object ends.
+            payday (int): The day of the month the income object is received.
 
         Returns:
             None
@@ -371,84 +374,101 @@ class income:
         self.category = category.lower()
         self.startdate = startdate
         self.enddate = enddate
+        self.payday = payday
 
-    def amount_earned_month(self, date):
+    def paydays(self):
         '''
-        This function calculates the amount of money received from the income
-        object so far in the month from a percentage of the month that has passed.
+        This function calculates the dates of the paydays for a given frequency
+        and date range.
 
         Inputs:
-            date (datetime): The date to calculate the amount of money received from the income object so far in the month.
+            None
 
         Returns:
-            amount_received (float): The amount of money received from the income object so far in the month.
+            paydays (list): A list of the dates of the paydays for a given frequency and date range.
         '''
-        
-        # Create a datetime object for the first day of the month
-        first_day = dt.date(date.year, date.month, 1)
 
-        # Create a datetime object for the last day of the month
-        last_day = dt.date(date.year, date.month, calendar.monthrange(date.year, date.month)[1])
+        startdate = self.startdate
+        enddate = self.enddate
+        payday = self.payday
 
-        # Calculate the number of days in the month
-        num_days = (last_day - first_day).days + 1
+        # Find the first payday in the date range
+        if startdate.day <= payday:
+            first_payday = dt.date(startdate.year, startdate.month, payday)
+        else:
+            first_payday = dt.date(startdate.year, startdate.month + 1, payday)
 
-        # Calculate the number of days that have passed in the month
-        days_passed = (date - first_day).days + 1
+        # Find the last payday in the date range
+        last_payday = dt.date(enddate.year, enddate.month, payday)
 
-        # Calculate the percentage of the month that has passed
-        percent_passed = days_passed / num_days
+        # Find the dates of the paydays in the date range with the given frequency
+        # and return them as a list
+        paydays = []
+        if self.frequency == 'weekly':
+            payday = first_payday
+            while payday <= last_payday:
+                paydays.append(payday)
+                payday += dt.timedelta(days = 7)
+        elif self.frequency == 'biweekly':
+            payday = first_payday
+            while payday <= last_payday:
+                paydays.append(payday)
+                payday += dt.timedelta(days = 14)
+        elif self.frequency == 'monthly':
+            payday = first_payday
+            while payday <= last_payday:
+                paydays.append(payday)
+                payday += relativedelta(months = 1)
+        elif self.frequency == 'bimonthly':
+            payday = first_payday
+            while payday <= last_payday:
+                paydays.append(payday)
+                payday += relativedelta(months = 2)
+        elif self.frequency == 'quarterly':
+            payday = first_payday
+            while payday <= last_payday:
+                paydays.append(payday)
+                payday += relativedelta(months = 3)
+        elif self.frequency == 'semiannually':
+            payday = first_payday
+            while payday <= last_payday:
+                paydays.append(payday)
+                payday += relativedelta(months = 6)
+        elif self.frequency == 'yearly':
+            payday = first_payday
+            while payday <= last_payday:
+                paydays.append(payday)
+                payday += relativedelta(years = 1)
 
-        # Calculate the amount of money received from the income object so far in the month
-        amount_received = self.amount * percent_passed
+        return paydays
 
-        # Return the amount of money received from the income object so far in the month
-        return amount_received
-    
-    def amount_earned_diff(self, startdate, enddate):
+    def amount_earned(self):
         '''
-        This function returns the amount of money earned on the income object in the date range.
-        This looks for how many times the amount is paid in a given date range and multiplies that by the amount.
+        This function calculates the amount of money recieved from the income 
+        object in the date range. This is done by calculating the number of
+        times the income is recieved on the payday and adding the amount days
+        relating to the frequency of the income object until the end date is
+        reached.
 
         Inputs:
-            startdate (datetime): The date the date range starts.
-            enddate (datetime): The date the date range ends.
+            None
 
         Returns:
-            amount_earned (float): The amount of money earned on the income object in the date range.
+            amount_earned (float): The amount of money recieved from the income object in the date range.
         '''
 
-        # The income start date and the income frequency
-        income_start_date = self.startdate
-        income_frequency = self.frequency
+        startdate = self.startdate
+        enddate = self.enddate
+        payday = self.payday
 
-        # Determine the date for each income payment in the date range
-        income_dates = []
-        if income_frequency == 'daily':
-            # If the income is daily, then the income is paid every day
-            income_dates = [income_start_date + dt.timedelta(days=x) for x in range((enddate - income_start_date).days + 1)]
-        elif income_frequency == 'weekly':
-            # If the income is weekly, then the income is paid every 7 days
-            income_dates = [income_start_date + dt.timedelta(days=x) for x in range((enddate - income_start_date).days + 1) if x % 7 == 0]
-        elif income_frequency == 'biweekly':
-            # If the income is biweekly, then the income is paid every 14 days
-            income_dates = [income_start_date + dt.timedelta(days=x) for x in range((enddate - income_start_date).days + 1) if x % 14 == 0]
-        elif income_frequency == 'monthly':
-            # If the income is monthly, then the income is paid every month
-            income_dates = [income_start_date + relativedelta(months=x) for x in range(0, (enddate.year - income_start_date.year) \
-                                                                                       * 12 + (enddate.month - income_start_date.month) + 1)]
-        elif income_frequency == 'yearly':
-            # If the income is yearly, then the income is paid every year
-            income_dates = [income_start_date + relativedelta(years=x) for x in range(0, enddate.year - income_start_date.year + 1)]
+        # Determine the dates of the paydays for a given frequency and date range
+        paydays = self.paydays()
 
-        # Determine the number of income payments in the date range
-        num_income_payments = len(income_dates)
+        # Calculate the amount of money recieved from the income object in the date range
+        amount_earned = self.amount * len(paydays)
 
-        # Calculate the amount of money earned on the income object in the date range
-        amount_earned = num_income_payments * self.amount
+        return amount_earned        
 
-        # Return the amount of money earned on the income object in the date range
-        return amount_earned
     
 # Define the account class
 class account:
@@ -605,7 +625,7 @@ class account:
         # Iterate through each income object in the account object
         for income in self.incomes:
             # Calculate the amount received from the income object in the date range
-            total_received += income.amount_earned_diff(startdate, enddate)
+            total_received += income.amount_earned()
 
         # Return the total amount received from incomes in the date range
         return total_received
@@ -651,13 +671,12 @@ class account:
             self.balance -= amount_spent
 
     # Define the receive_incomes function for a date range
-    def receive_incomes(self, startdate, enddate):
+    def receive_incomes(self):
         '''
         This function receives all the incomes in the account object in a date range.
 
         Inputs:
-            startdate (datetime): The start date of the date range.
-            enddate (datetime): The end date of the date range.
+            None
 
         Returns:
             None
@@ -665,7 +684,7 @@ class account:
         # Iterate through each income object in the account object and determine the total amount received from the income object in the date range
         for income in self.incomes:
             # Calculate the amount received from the income object in the date range
-            amount_received = income.amount_earned_diff(startdate, enddate)
+            amount_received = income.amount_earned()
 
             # Add the amount received from the income object in the date range to the account object's balance
             self.balance += amount_received
@@ -675,14 +694,15 @@ class account:
 # Define transfer class
 class transfer:
     # Define the initialization function
-    def __init__(self, name, amount, startdate, enddate, frequency, from_account, to_account):
+    def __init__(self, name, amount, startdate, enddate, depositday, frequency, from_account, to_account):
         '''
             This function initializes the transfer object's attributes.
 
             Attributes:
                 name (str): The name of the transfer object.
-                startdate (datetime): The date of the transfer object.
-                enddate (datetime): The date of the transfer object.
+                startdate (datetime): The start date of the transfer object.
+                enddate (datetime): The end date of the transfer object.
+                depositday (int): The day of the month of the transfer object.
                 amount (float): The amount of the transfer object.
                 frequency (str): The frequency of the transfer object.
                 from_account (account): The account object the transfer object is from.
@@ -692,6 +712,7 @@ class transfer:
         self.amount = amount
         self.startdate = startdate
         self.enddate = enddate
+        self.depositday = depositday
         self.frequency = frequency.lower()
         self.from_account = from_account
         self.to_account = to_account
@@ -713,8 +734,25 @@ class transfer:
         # Returns the transfer_summary string
         return transfer_summary
         
+    # Define the attribute function
+    def attributes(self):
+        '''
+        This function returns the transfer object's attributes.
+
+        Inputs:
+            None
+
+        Returns:
+            attribute (list): The attribute of the transfer object.
+        '''
+        # Creates list of the transfer object's attributes
+        attribute = [self.name, self.amount, self.startdate, self.enddate, self.depositday, self.frequency, self.from_account, self.to_account]
+
+        # Returns the attribute list
+        return attribute
+
     # Define the update function
-    def update(self, name, amount, startdate, enddate, frequency, from_account, to_account):
+    def update(self, name, amount, startdate, enddate, depositday, frequency, from_account, to_account):
         '''
         This function updates the transfer object's attributes.
 
@@ -722,6 +760,7 @@ class transfer:
             name (str): The name of the transfer object.
             startdate (datetime): The date of the transfer object.
             enddate (datetime): The date of the transfer object.
+            depositday (int): The day of the month of the transfer object.
             amount (float): The amount of the transfer object.
             frequency (str): The frequency of the transfer object.
             from_account (account): The account object the transfer object is from.
@@ -734,6 +773,7 @@ class transfer:
         self.amount = amount
         self.startdate = startdate
         self.enddate = enddate
+        self.depositday = depositday
         self.frequency = frequency.lower()
         self.from_account = from_account
         self.to_account = to_account
@@ -756,6 +796,106 @@ class transfer:
 
         # Uses the transfer amount to update the to_account object's balance
         self.to_account.balance += self.amount
+
+    # Define the deposit days function
+    def deposit_days(self):
+        '''
+        This function returns a list of the deposit days in a date range
+        accounting for the frequency of the transfer object.
+
+        Inputs:
+            None
+
+        Returns:
+            deposit_days (list): A list of the deposit days in a date range.
+        '''
+
+        depositday = self.depositday
+        startdate = self.startdate
+        enddate = self.enddate
+
+        # Initialize the deposit_days list
+        deposit_days = []
+
+        # Find the first deposit day in the date range
+        if startdate.day <= depositday:
+            first_deposit_day = dt.date(startdate.year, startdate.month, depositday)
+        else:
+            first_deposit_day = dt.date(startdate.year, startdate.month + 1, depositday)
+
+        # Find the last deposit day in the date range
+        last_deposit_day = dt.date(enddate.year, enddate.month, depositday)
+
+
+        # Find the dates of the deposit days in the date range accounting for the 
+        # frequency of the transfer object
+        if self.frequency == 'weekly':
+            deposited_day = first_deposit_day
+            while deposited_day <= last_deposit_day:
+                deposit_days.append(deposited_day)
+                deposited_day += dt.timedelta(days=7)
+        elif self.frequency == 'biweekly':
+            deposited_day = first_deposit_day
+            while deposited_day <= last_deposit_day:
+                deposit_days.append(deposited_day)
+                deposited_day += dt.timedelta(days=14)
+        elif self.frequency == 'monthly':
+            deposited_day = first_deposit_day
+            while deposited_day <= last_deposit_day:
+                deposit_days.append(deposited_day)
+                deposited_day += relativedelta(months=1)
+        elif self.frequency == 'bimonthly':
+            deposited_day = first_deposit_day
+            while deposited_day <= last_deposit_day:
+                deposit_days.append(deposited_day)
+                deposited_day += relativedelta(months=2)
+        elif self.frequency == 'quarterly':
+            deposited_day = first_deposit_day
+            while deposited_day <= last_deposit_day:
+                deposit_days.append(deposited_day)
+                deposited_day += relativedelta(months=3)
+        elif self.frequency == 'semiannually':
+            deposited_day = first_deposit_day
+            while deposited_day <= last_deposit_day:
+                deposit_days.append(deposited_day)
+                deposited_day += relativedelta(months=6)
+        elif self.frequency == 'yearly':
+            deposited_day = first_deposit_day
+            while deposited_day <= last_deposit_day:
+                deposit_days.append(deposited_day)
+                deposited_day += relativedelta(years=1)
+            
+        # Returns the deposit_days list
+        return deposit_days
+    
+    # Define the reaccuring transfer function
+    def reaccuring_transfer(self):
+        '''
+        This function transfers money from one account object to another account object in a date range.
+        It uses the account update function to update the account objects' balances. 
+
+        Inputs:
+            None
+
+        Returns:
+            None
+        '''
+
+        depositday = self.depositday
+        startdate = self.startdate
+        enddate = self.enddate
+        from_account = self.from_account
+        to_account = self.to_account
+
+        # Find the deposit days in the date range
+        deposit_days = self.deposit_days()
+        
+        # Update the accounts objects' balances
+        from_account.balance -= self.amount*len(deposit_days)
+        to_account.balance += self.amount*len(deposit_days)
+
+        return deposit_days
+
 
 
 # Define the budget class
@@ -911,37 +1051,6 @@ class budget:
 
         # Returns the total_earned variable
         return total_earned
-    
-    # Define the test_budget_regular_transfer function
-    def regular_transfer(self, transfer):
-        '''
-        This function tests the budget class's regular transfer function. That is, it uses the start transfer date
-        and then transfers the amount every frequency until the end transfer date.
-
-        Inputs:
-            transfer (transfer): The transfer object to be tested.
-
-        Returns:    
-            None
-        '''
-
-        # Initialize the current date variable
-        current_date = transfer.startdate
-
-        # Iterate through each date in the date range
-        while current_date <= transfer.enddate:
-            # Transfer the amount
-            transfer.transfer()
-
-            # Increment the current date by the frequency depending is the frequency is weekly, biweekly, monthly, or yearly
-            if transfer.frequency == 'weekly':
-                current_date += timedelta(days=7)
-            elif transfer.frequency == 'biweekly':
-                current_date += timedelta(days=14)
-            elif transfer.frequency == 'monthly':
-                current_date += timedelta(days=30)
-            elif transfer.frequency == 'yearly':
-                current_date += timedelta(days=365)
 
     # Define the total_balance function
     def total_balance(self):
@@ -983,7 +1092,7 @@ class budget:
 
         # Apply the regular transfers to the account object
         for transfer in self.transfers:
-            self.regular_transfer(transfer)
+            transfer.reaccuring_transfer()
 
         # Iterate through each account object in the budget object and adjust the balances to account for the money spent and earned and the transfers
         for account in self.accounts:
