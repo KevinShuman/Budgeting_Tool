@@ -182,9 +182,7 @@ def test_budget_reaccuring_transfer(budget):
     budget = bl.budget(name="test budget", startdate=date1, enddate=date2, accounts=[account1, account2], transfers=[transfer])
 
     # Create a regular transfer from account1 to account2
-    deposit_days = transfer.reaccuring_transfer()
-
-    print(deposit_days)
+    budget.reaccuring_transfer()
 
     # Check that the account balances are updated correctly for the number of transfers that have occurred for the given period of time
     expected_balance1 = account1_balance - 1000.00 * 18

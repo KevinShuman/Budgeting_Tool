@@ -439,7 +439,7 @@ class income:
             while payday <= last_payday:
                 paydays.append(payday)
                 payday += relativedelta(years = 1)
-
+        
         return paydays
 
     def amount_earned(self):
@@ -625,7 +625,8 @@ class account:
         # Iterate through each income object in the account object
         for income in self.incomes:
             # Calculate the amount received from the income object in the date range
-            total_received += income.amount_earned()
+            if income.payday >= startdate.day and income.payday <= enddate.day:
+                total_received += income.amount_earned()
 
         # Return the total amount received from incomes in the date range
         return total_received
@@ -867,34 +868,6 @@ class transfer:
             
         # Returns the deposit_days list
         return deposit_days
-    
-    # Define the reaccuring transfer function
-    def reaccuring_transfer(self):
-        '''
-        This function transfers money from one account object to another account object in a date range.
-        It uses the account update function to update the account objects' balances. 
-
-        Inputs:
-            None
-
-        Returns:
-            None
-        '''
-
-        depositday = self.depositday
-        startdate = self.startdate
-        enddate = self.enddate
-        from_account = self.from_account
-        to_account = self.to_account
-
-        # Find the deposit days in the date range
-        deposit_days = self.deposit_days()
-        
-        # Update the accounts objects' balances
-        from_account.balance -= self.amount*len(deposit_days)
-        to_account.balance += self.amount*len(deposit_days)
-
-        return deposit_days
 
 
 
@@ -1074,6 +1047,50 @@ class budget:
         # Returns the total_balance variable
         return total_balance
     
+    # Define the reaccuring transfer function
+    def reaccuring_transfer(self):
+        '''
+        This function transfers money from one account object to another account object in a date range.
+        It uses the account update function to update the account objects' balances. 
+
+        Inputs:
+            startdate (datetime): The start date over the range of considered dates.
+            enddate (datetime): The end date over the range of considered dates.
+
+        Returns:
+            None
+        '''
+        
+        startdate = self.startdate
+        enddate = self.enddate
+
+        for transfer in self.transfers:
+            deposit_days = transfer.deposit_days()
+            if transfer.depositday >= startdate.day and transfer.depositday <= enddate.day:
+                for deposit_day in deposit_days:
+                    transfer.transfer()
+            elif transfer.depositday < startdate.day and transfer.depositday <= enddate.day:
+                for i in range(len(deposit_days) - 1):
+                    transfer.transfer()
+            elif transfer.depositday >= startdate.day and transfer.depositday > enddate.day:
+                for i in range(len(deposit_days) - 1):
+                    transfer.transfer()
+            elif transfer.depositday < startdate.day and transfer.depositday > enddate.day:
+                for i in range(len(deposit_days) - 2):
+                    transfer.transfer()
+
+        # depositday = self.depositday
+        # from_account = self.from_account
+        # to_account = self.to_account
+
+        # # Find the deposit days in the date range
+        # deposit_days = self.deposit_days()
+        
+        # # Update the accounts objects' balances
+        # if self.depositday >= startdate.day and self.depositday <= enddate.day:
+        #     from_account.balance -= self.amount*len(deposit_days)
+        #     to_account.balance += self.amount*len(deposit_days)
+    
     # Define the summary_final function
     def summary_final(self):
         '''
@@ -1092,7 +1109,7 @@ class budget:
 
         # Apply the regular transfers to the account object
         for transfer in self.transfers:
-            transfer.reaccuring_transfer()
+            self.reaccuring_transfer()
 
         # Iterate through each account object in the budget object and adjust the balances to account for the money spent and earned and the transfers
         for account in self.accounts:
