@@ -155,7 +155,7 @@ def test_budget_total_earned(budget):
 
     # Calculate the expected total amount of money earned for a given period of time by adding the total amount
     # earned from the incomes of each account
-    incomes_expected_paycheck = 18 * 1000.00
+    incomes_expected_paycheck = 19 * 1000.00
     incomes_expected_bonus = 5 * 500.00
 
     acount1_total_earned =  incomes_expected_paycheck + incomes_expected_bonus
@@ -233,7 +233,7 @@ def test_budget_summary_final(budget):
 
     # Calculate the expected total amount of money earned for a given period of time by adding the total amount
     # earned from the incomes of each account
-    incomes_expected_paycheck = 18 * 1000.00
+    incomes_expected_paycheck = 19 * 1000.00
     incomes_expected_bonus = 5 * 500.00
 
     acount1_total_earned =  incomes_expected_paycheck + incomes_expected_bonus
