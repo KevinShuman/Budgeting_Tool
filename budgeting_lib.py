@@ -393,52 +393,49 @@ class income:
         payday = self.payday
 
         # Find the first payday in the date range
-        if startdate.day <= payday:
-            first_payday = dt.date(startdate.year, startdate.month, payday)
-        else:
-            first_payday = dt.date(startdate.year, startdate.month + 1, payday)
-
-        # Find the last payday in the date range
-        last_payday = dt.date(enddate.year, enddate.month, payday)
+        first_payday = dt.date(startdate.year, startdate.month, payday)
 
         # Find the dates of the paydays in the date range with the given frequency
         # and return them as a list
         paydays = []
         if self.frequency == 'weekly':
             payday = first_payday
-            while payday <= last_payday:
+            while payday <= enddate:
                 paydays.append(payday)
                 payday += dt.timedelta(days = 7)
         elif self.frequency == 'biweekly':
             payday = first_payday
-            while payday <= last_payday:
+            while payday <= enddate:
                 paydays.append(payday)
                 payday += dt.timedelta(days = 14)
         elif self.frequency == 'monthly':
             payday = first_payday
-            while payday <= last_payday:
+            while payday <= enddate:
                 paydays.append(payday)
                 payday += relativedelta(months = 1)
         elif self.frequency == 'bimonthly':
             payday = first_payday
-            while payday <= last_payday:
+            while payday <= enddate:
                 paydays.append(payday)
                 payday += relativedelta(months = 2)
         elif self.frequency == 'quarterly':
             payday = first_payday
-            while payday <= last_payday:
+            while payday <= enddate:
                 paydays.append(payday)
                 payday += relativedelta(months = 3)
         elif self.frequency == 'semiannually':
             payday = first_payday
-            while payday <= last_payday:
+            while payday <= enddate:
                 paydays.append(payday)
                 payday += relativedelta(months = 6)
         elif self.frequency == 'yearly':
             payday = first_payday
-            while payday <= last_payday:
+            while payday <= enddate:
                 paydays.append(payday)
                 payday += relativedelta(years = 1)
+        
+        # Find all the paydays within the date range
+        paydays = [payday for payday in paydays if payday >= startdate and payday <= enddate]
 
         return paydays
 
@@ -625,7 +622,16 @@ class account:
         # Iterate through each income object in the account object
         for income in self.incomes:
             # Calculate the amount received from the income object in the date range
+            income_startdate = income.startdate
+            income_enddate = income.enddate
+
+            income.startdate = startdate
+            income.enddate = enddate
+
             total_received += income.amount_earned()
+
+            income.startdate = income_startdate
+            income.enddate = income_enddate
 
         # Return the total amount received from incomes in the date range
         return total_received
@@ -817,83 +823,51 @@ class transfer:
         # Initialize the deposit_days list
         deposit_days = []
 
-        # Find the first deposit day in the date range
-        if startdate.day <= depositday:
-            first_deposit_day = dt.date(startdate.year, startdate.month, depositday)
-        else:
-            first_deposit_day = dt.date(startdate.year, startdate.month + 1, depositday)
-
-        # Find the last deposit day in the date range
-        last_deposit_day = dt.date(enddate.year, enddate.month, depositday)
-
+        # Find the first deposit day in the month of the start date
+        first_deposit_day = dt.date(startdate.year, startdate.month, depositday)
 
         # Find the dates of the deposit days in the date range accounting for the 
         # frequency of the transfer object
         if self.frequency == 'weekly':
             deposited_day = first_deposit_day
-            while deposited_day <= last_deposit_day:
+            while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += dt.timedelta(days=7)
         elif self.frequency == 'biweekly':
             deposited_day = first_deposit_day
-            while deposited_day <= last_deposit_day:
+            while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += dt.timedelta(days=14)
         elif self.frequency == 'monthly':
             deposited_day = first_deposit_day
-            while deposited_day <= last_deposit_day:
+            while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += relativedelta(months=1)
         elif self.frequency == 'bimonthly':
             deposited_day = first_deposit_day
-            while deposited_day <= last_deposit_day:
+            while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += relativedelta(months=2)
         elif self.frequency == 'quarterly':
             deposited_day = first_deposit_day
-            while deposited_day <= last_deposit_day:
+            while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += relativedelta(months=3)
         elif self.frequency == 'semiannually':
             deposited_day = first_deposit_day
-            while deposited_day <= last_deposit_day:
+            while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += relativedelta(months=6)
         elif self.frequency == 'yearly':
             deposited_day = first_deposit_day
-            while deposited_day <= last_deposit_day:
+            while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += relativedelta(years=1)
-            
+
+        # Find which dates are in the date range
+        deposit_days = [day for day in deposit_days if day >= startdate and day <= enddate]
+
         # Returns the deposit_days list
-        return deposit_days
-    
-    # Define the reaccuring transfer function
-    def reaccuring_transfer(self):
-        '''
-        This function transfers money from one account object to another account object in a date range.
-        It uses the account update function to update the account objects' balances. 
-
-        Inputs:
-            None
-
-        Returns:
-            None
-        '''
-
-        depositday = self.depositday
-        startdate = self.startdate
-        enddate = self.enddate
-        from_account = self.from_account
-        to_account = self.to_account
-
-        # Find the deposit days in the date range
-        deposit_days = self.deposit_days()
-        
-        # Update the accounts objects' balances
-        from_account.balance -= self.amount*len(deposit_days)
-        to_account.balance += self.amount*len(deposit_days)
-
         return deposit_days
 
 
@@ -1074,6 +1048,38 @@ class budget:
         # Returns the total_balance variable
         return total_balance
     
+    # Define the reaccuring transfer function
+    def reaccuring_transfer(self):
+        '''
+        This function transfers money from one account object to another account object in a date range.
+        It uses the account update function to update the account objects' balances. 
+
+        Inputs:
+            startdate (datetime): The start date over the range of considered dates.
+            enddate (datetime): The end date over the range of considered dates.
+
+        Returns:
+            None
+        '''
+        
+        startdate = self.startdate
+        enddate = self.enddate
+
+        for transfer in self.transfers:
+            transfer_startdate = transfer.startdate
+            transfer_enddate = transfer.enddate
+
+            transfer.startdate = startdate
+            transfer.enddate = enddate
+
+            deposit_days = transfer.deposit_days()
+
+            for deposit_day in deposit_days:
+                transfer.transfer()
+
+            transfer.startdate = transfer_startdate
+            transfer.enddate = transfer_enddate
+    
     # Define the summary_final function
     def summary_final(self):
         '''
@@ -1092,7 +1098,7 @@ class budget:
 
         # Apply the regular transfers to the account object
         for transfer in self.transfers:
-            transfer.reaccuring_transfer()
+            self.reaccuring_transfer()
 
         # Iterate through each account object in the budget object and adjust the balances to account for the money spent and earned and the transfers
         for account in self.accounts:

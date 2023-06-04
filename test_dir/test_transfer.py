@@ -145,3 +145,70 @@ def test_transfer_transfer(transfer):
     # Assert that the money has been transferred
     assert account1.balance == 19000.00
     assert account2.balance == 11000.00
+
+# Test number 6: The transfer class should be able to find the dates that the transfer will occur on
+#                given a start date, end date, tranfer date, and frequency. There are several cases to consider:
+#                1. The transfer date is before the start date
+#                2. The transfer date is after the end date
+#                3. The transfer date is on the start date
+#                4. The transfer date is on the end date
+#                5. The transfer date is between the start date and end date
+def test_transfer_deposit_days(transfer):
+    account1, account2, date1, date2 = transfer
+
+    # date1 = dt.date(2020, 10, 15)
+    # date2 = dt.date(2021, 2, 17)
+
+    # Create the transfer object with deposit day for each of the cases above
+    # Case 1 - deposit day is before the start date
+    transfer1 = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=10, frequency="weekly", from_account=account1, to_account=account2)
+
+    # Case 2 - deposit day is after the end date
+    transfer2 = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=20, frequency="weekly", from_account=account1, to_account=account2)
+
+    # Case 3 - deposit day is on the start date
+    transfer3 = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=15, frequency="weekly", from_account=account1, to_account=account2)
+
+    # Case 4 - deposit day is on the end date
+    transfer4 = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=17, frequency="weekly", from_account=account1, to_account=account2)
+
+    # Case 5 - deposit day is between the start date and end date
+    transfer5 = bl.transfer(name="transfer", amount=1000.00, startdate=date1, enddate=date2, depositday=16, frequency="weekly", from_account=account1, to_account=account2)
+
+
+    # Create the transfer dates
+    transfer_dates_1 = transfer1.deposit_days()
+    transfer_dates_2 = transfer2.deposit_days()
+    transfer_dates_3 = transfer3.deposit_days()
+    transfer_dates_4 = transfer4.deposit_days()
+    transfer_dates_5 = transfer5.deposit_days()
+
+    # Create all the expected transfer dates for each of the cases above
+    # Case 1 - deposit day is before the start date
+    transfer_dates_expected_1 = [dt.date(2020, 10, 17), dt.date(2020, 10, 24), dt.date(2020, 10, 31), dt.date(2020, 11, 7), dt.date(2020, 11, 14), dt.date(2020, 11, 21), dt.date(2020, 11, 28), dt.date(2020, 12, 5), dt.date(2020, 12, 12), dt.date(2020, 12, 19), dt.date(2020, 12, 26), dt.date(2021, 1, 2), dt.date(2021, 1, 9), dt.date(2021, 1, 16), dt.date(2021, 1, 23), dt.date(2021, 1, 30), dt.date(2021, 2, 6), dt.date(2021, 2, 13)]
+
+    # Case 2 - deposit day is after the end date
+    transfer_dates_expected_2 = [dt.date(2020, 10, 20), dt.date(2020, 10, 27), dt.date(2020, 11, 3), dt.date(2020, 11, 10), dt.date(2020, 11, 17), dt.date(2020, 11, 24), dt.date(2020, 12, 1), dt.date(2020, 12, 8), dt.date(2020, 12, 15), dt.date(2020, 12, 22), dt.date(2020, 12, 29), dt.date(2021, 1, 5), dt.date(2021, 1, 12), dt.date(2021, 1, 19), dt.date(2021, 1, 26), dt.date(2021, 2, 2), dt.date(2021, 2, 9), dt.date(2021, 2, 16)]
+
+    # Case 3 - deposit day is on the start date
+    transfer_dates_expected_3 = [dt.date(2020, 10, 15), dt.date(2020, 10, 22), dt.date(2020, 10, 29), dt.date(2020, 11, 5), dt.date(2020, 11, 12), dt.date(2020, 11, 19), dt.date(2020, 11, 26), dt.date(2020, 12, 3), dt.date(2020, 12, 10), dt.date(2020, 12, 17), dt.date(2020, 12, 24), dt.date(2020, 12, 31), dt.date(2021, 1, 7), dt.date(2021, 1, 14), dt.date(2021, 1, 21), dt.date(2021, 1, 28), dt.date(2021, 2, 4), dt.date(2021, 2, 11)]
+
+    # Case 4 - deposit day is on the end date
+    transfer_dates_expected_4 = [dt.date(2020, 10, 17), dt.date(2020, 10, 24), dt.date(2020, 10, 31), dt.date(2020, 11, 7), dt.date(2020, 11, 14), dt.date(2020, 11, 21), dt.date(2020, 11, 28), dt.date(2020, 12, 5), dt.date(2020, 12, 12), dt.date(2020, 12, 19), dt.date(2020, 12, 26), dt.date(2021, 1, 2), dt.date(2021, 1, 9), dt.date(2021, 1, 16), dt.date(2021, 1, 23), dt.date(2021, 1, 30), dt.date(2021, 2, 6), dt.date(2021, 2, 13)]
+
+    # Case 5 - deposit day is between the start date and end date
+    transfer_dates_expected_5 = [dt.date(2020, 10, 16), dt.date(2020, 10, 23), dt.date(2020, 10, 30), dt.date(2020, 11, 6), dt.date(2020, 11, 13), dt.date(2020, 11, 20), dt.date(2020, 11, 27), dt.date(2020, 12, 4), dt.date(2020, 12, 11), dt.date(2020, 12, 18), dt.date(2020, 12, 25), dt.date(2021, 1, 1), dt.date(2021, 1, 8), dt.date(2021, 1, 15), dt.date(2021, 1, 22), dt.date(2021, 1, 29), dt.date(2021, 2, 5), dt.date(2021, 2, 12)]
+
+    # Find the difference between the transfer dates and the expected transfer dates for each case
+    transfer_dates_1_diff = [transfer_dates_1[i] - transfer_dates_expected_1[i] for i in range(len(transfer_dates_1))]
+    transfer_dates_2_diff = [transfer_dates_2[i] - transfer_dates_expected_2[i] for i in range(len(transfer_dates_2))]
+    transfer_dates_3_diff = [transfer_dates_3[i] - transfer_dates_expected_3[i] for i in range(len(transfer_dates_3))]
+    transfer_dates_4_diff = [transfer_dates_4[i] - transfer_dates_expected_4[i] for i in range(len(transfer_dates_4))]
+    transfer_dates_5_diff = [transfer_dates_5[i] - transfer_dates_expected_5[i] for i in range(len(transfer_dates_5))]
+
+    # Assert that the transfer dates are correct
+    assert transfer_dates_1 == transfer_dates_expected_1
+    assert transfer_dates_2 == transfer_dates_expected_2
+    assert transfer_dates_3 == transfer_dates_expected_3
+    assert transfer_dates_4 == transfer_dates_expected_4
+    assert transfer_dates_5 == transfer_dates_expected_5

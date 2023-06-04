@@ -96,7 +96,7 @@ def test_income_amount():
     # the number of times the income is paid between the two dates multiplied by the amount of the income. The number of times the
     # income is paid is determined by starting on the 10th of the month and adding the frequency to the date until the end date is
     # reached.
-    amount1 = 1000.00 * 18
+    amount1 = 1000.00 * 19
     assert income_Paycheck.amount_earned() == amount1
 
     # The amount received between the 10th of October 2020 and the 17th of February 2021 for the income_Bonus object should be

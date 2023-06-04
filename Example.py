@@ -19,7 +19,7 @@ args.enddate = dt.datetime.strptime(args.enddate, '%Y-%m-%d').date()
 # The income start date might be different for each income source, because of the start date is
 # the day the income is earn and related to the frequency of the income source.
 # Similarly is true for the transfer start date.
-startdate = dt.date(2023, 12, 1)
+startdate = dt.date(2023, 1, 1)
 enddate = dt.date(2023, 12, 31)
 
 # Create bills, expenses, and incomes
@@ -48,7 +48,7 @@ expenses = [
 
 # An income has a name, amount, frequency, category, startdate, enddate, and ifweekday
 incomes = [
-                bl.income(name="paycheck", amount=3000.00, frequency="biweekly", category="income", startdate=startdate, enddate=enddate, ifweekday=True)
+                bl.income(name="paycheck", amount=3000.00, frequency="biweekly", category="income", startdate=startdate, enddate=enddate, payday=1, ifweekday=True)
 ]
 
 # Create three accounts
@@ -66,8 +66,8 @@ travel_account = accounts[2]
 
 # A transfer has a name, startdate, enddate, amount, frequency, from_account, and to_account
 transfers = [
-                bl.transfer(name="savings", startdate=startdate, enddate=enddate, amount=300.00, frequency="biweekly", from_account=checking_account, to_account=saving_account),
-                bl.transfer(name="travel", startdate=startdate, enddate=enddate, amount=100.00, frequency="biweekly", from_account=checking_account, to_account=travel_account),
+                bl.transfer(name="savings", startdate=startdate, enddate=enddate, depositday=1, amount=300.00, frequency="biweekly", from_account=checking_account, to_account=saving_account),
+                bl.transfer(name="travel", startdate=startdate, enddate=enddate, depositday=1, amount=100.00, frequency="biweekly", from_account=checking_account, to_account=travel_account),
 ]
 
 # Create a budget

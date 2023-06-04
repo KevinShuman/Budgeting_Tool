@@ -118,7 +118,7 @@ def test_account_total(bills_expenses_incomes):
     # The total amount of incomes for the date range. This is just the number of times the income is paid in the date range multiplied by the amount of the income
     # The income "Paycheck" is paid weekly and it starts on the 15th of October 2020 and ends on the 17th of February 2021. Since there are 17 weeks in this date range,
     # the total amount of income for this date range is 17 * 1000.00 = 17000.00
-    incomes_expected_paycheck = 18 * 1000.00
+    incomes_expected_paycheck = 19 * 1000.00
 
     # The income "Bonus" is paid monthly and it starts on the 15th of October 2020 and ends on the 17th of February 2021. The range runs over the 15th of each month
     # this many times: October, November, December, January, February. Therefore, the total amount of income for this date range is 5 * 500.00 = 2500.00
@@ -156,6 +156,6 @@ def test_account_pay(bills_expenses_incomes):
     account.receive_incomes()
 
     # The incomes are paid on the 15th of each month. Therefore, the balance should be increased by the total amount of incomes for the date range
-    account_expected = account_expected + 18 * 1000.00 + 5 * 500.00
+    account_expected = account_expected + 19 * 1000.00 + 5 * 500.00
     # Assert that these number are close enough to each other
     assert math.isclose(account.balance, account_expected)
