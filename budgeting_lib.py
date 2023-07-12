@@ -1,9 +1,7 @@
 # Import the necessary modules
 import numpy as np
 import datetime as dt
-import time
 import calendar
-import math
 from dateutil.relativedelta import relativedelta
 from datetime import timedelta
 
@@ -1132,14 +1130,15 @@ class budget:
             transfer.enddate = transfer_enddate
     
     # Define the summary_final function
-    def summary_final(self):
+    def summary_final(self, dict=False, verbose=False):
         '''
         This function returns a summary of the total spent, total earned, 
         and total balance of the budget object as well as the balances of
         each account object.
 
         Inputs:
-            None
+            dict (bool): Outputs an array instead of a print statement.
+            verbose (bool): Outputs a more detailed summary.
 
         Returns:
             budget_summary (str): The summary of the budget object.        
@@ -1160,9 +1159,21 @@ class budget:
             account_summary += f'\t{account.name}: ${total_balance:.2f}\n'
 
         # Creates string for the budget object's attributes
-        # "Total spent: ${:.2f}\nTotal earned: ${:.2f}\nTotal balance: ${:.2f}\nAccount balances:\n\t{}: ${:.2f}\n\t{}: ${:.2f}\n".format(expected_total_spent, expected_total_earned, expected_total_balance, account1.name, account1.balance, account2.name, account2.balance)
-        budget_summary = f'Total spent: ${self.total_spent():.2f}\nTotal earned: ${self.total_earned():.2f}\nTotal balance: ${self.total_balance()+self.total_earned()-self.total_spent():.2f}\nAccount balances:\n' + account_summary
+        if dict is True:
+            budget_summary = {"Total Spent": self.total_spent(), "Total Earned": self.total_earned(), "Total Balance": self.total_balance()+self.total_earned()-self.total_spent()}
+            for account in self.accounts:
+                total_spent = account.total_bills(self.startdate, self.enddate) + account.total_expenses(self.startdate, self.enddate)
+                total_earned = account.total_incomes(self.startdate, self.enddate)
+                total_balance = account.balance + total_earned - total_spent
+                budget_summary[f"{account.name} Balance"] = total_balance
+                if verbose is True:
+                    budget_summary[f"{account.name} Bills"] = account.total_bills(self.startdate, self.enddate)
+                    budget_summary[f"{account.name} Expenses"] = account.total_expenses(self.startdate, self.enddate)
+                    budget_summary[f"{account.name} Incomes"] = account.total_incomes(self.startdate, self.enddate)
+        else:
+            budget_summary = f'Total spent: ${self.total_spent():.2f}\nTotal earned: ${self.total_earned():.2f}\nTotal balance: ${self.total_balance()+self.total_earned()-self.total_spent():.2f}\nAccount balances:\n' + account_summary
 
 
         # Returns the budget_summary string
         return budget_summary
+    

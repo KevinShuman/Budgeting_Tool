@@ -262,4 +262,3 @@ def test_budget_summary_final(budget):
 
     # Check that the budget object returns the correct summary string
     assert summary == expected_summary
-
