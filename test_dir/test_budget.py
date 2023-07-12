@@ -37,9 +37,9 @@ def bills_expenses_incomes():
     date2 = dt.date(2021, 2, 17)
 
     # Create a list of three bills, a list of two incomes, and a list of 2 expenses
-    bills = [bl.bill(name="Electricity", amount=100.00, category="Utilities", frequency="Monthly", duedate=1, ifweekday=True),
-                bl.bill(name="Water", amount=50.00, category="Utilities", frequency="Monthly", duedate=1, ifweekday=True),
-                bl.bill(name="Internet", amount=75.00, category="Utilities", frequency="Monthly", duedate=1, ifweekday=True)]
+    bills = [bl.bill(name="Electricity", amount=100.00, category="Utilities", frequency="Monthly", startdate=date1, enddate=date2, duedate=1, ifweekday=True),
+                bl.bill(name="Water", amount=50.00, category="Utilities", frequency="Monthly", startdate=date1, enddate=date2, duedate=1, ifweekday=True),
+                bl.bill(name="Internet", amount=75.00, category="Utilities", frequency="Monthly", startdate=date1, enddate=date2, duedate=1, ifweekday=True)]
        
     expenses = [bl.expense(name="Groceries", amount=100.00, category="Food", description="Groceries for the week"),
                 bl.expense(name="Gas", amount=50.00, category="Transportation", description="Gas for the car")]

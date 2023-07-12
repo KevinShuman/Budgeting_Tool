@@ -22,7 +22,7 @@ class bill:
     '''
 
     # Define the initialization function
-    def __init__(self, name, amount, frequency, duedate, ifweekday, category):
+    def __init__(self, name, amount, frequency, startdate, enddate, duedate, ifweekday, category):
         '''
             This function initializes the bill object's attributes.
         
@@ -30,6 +30,8 @@ class bill:
                 name (str): The name of the bill object.
                 amount (float): The amount of money the bill object is worth.
                 frequency (str): The frequency at which the bill object is due.
+                startdate (datetime): The date the bill object starts.
+                enddate (datetime): The date the bill object ends.
                 duedate (int): The date the bill object is due.
                 ifweekday (bool): Whether or not the bill object is due on the earliest weekday.
                 category (str): The category of the bill object.
@@ -39,6 +41,8 @@ class bill:
         self.amount = amount
         self.category = category.lower()
         self.frequency = frequency.lower()
+        self.startdate = startdate
+        self.enddate = enddate
         self.duedate = duedate
         self.ifweekday = ifweekday
 
@@ -68,9 +72,9 @@ class bill:
         Returns:
             attributes (list): A list of the bill object's attributes.
         '''
-        return [self.name, self.amount, self.category, self.frequency, self.duedate, self.ifweekday]
+        return [self.name, self.amount, self.category, self.frequency, self.startdate, self.enddate, self.duedate, self.ifweekday]
     
-    def update(self, name, amount, frequency, duedate, ifweekday, category):
+    def update(self, name, amount, frequency, startdate, enddate, duedate, ifweekday, category):
         '''
         This function updates the bill object's attributes.
 
@@ -78,6 +82,8 @@ class bill:
             name (str): The name of the bill object.
             amount (float): The amount of money the bill object is worth.
             frequency (str): The frequency at which the bill object is due.
+            startdate (datetime): The date the bill object starts.
+            enddate (datetime): The date the bill object ends.
             duedate (int): The date the bill object is due.
             ifweekday (bool): Whether or not the bill object is due on the earliest weekday.
             category (str): The category of the bill object.
@@ -89,47 +95,96 @@ class bill:
         self.amount = amount
         self.category = category.lower()
         self.frequency = frequency.lower()
+        self.startdate = startdate
+        self.enddate = enddate
         self.duedate = duedate
         self.ifweekday = ifweekday
 
-    # Calculate the amount spent on the bill object in the date range
-    def amount_spent(self, startdate, enddate):
+    # Define a function that determines a list of dates the bill is due between two dates
+    def duedates(self):
         '''
-        This function calculates the amount of money spent on the bill object in the date range.
+        This function determines a list of dates the bill is due between two dates.
 
         Inputs:
-            startdate (datetime): The start date of the date range.
-            enddate (datetime): The end date of the date range.
+            None
+
+        Returns:
+            due_dates (list): A list of dates the bill is due between two dates.
+        '''
+
+        startdate = self.startdate
+        enddate = self.enddate
+        duedate = self.duedate
+
+        # Find the first due date in the date range
+        first_duedate = dt.date(startdate.year, startdate.month, duedate)
+
+        # Find the dates of the due dates in the date range with the given frequency
+        # and return them as a list
+        duedates = []
+        if self.frequency == 'weekly':
+            duedate = first_duedate
+            while duedate <= enddate:
+                duedates.append(duedate)
+                duedate += dt.timedelta(days = 7)
+        elif self.frequency == 'biweekly':
+            duedate = first_duedate
+            while duedate <= enddate:
+                duedates.append(duedate)
+                duedate += dt.timedelta(days = 14)
+        elif self.frequency == 'monthly':
+            duedate = first_duedate
+            while duedate <= enddate:
+                duedates.append(duedate)
+                duedate += relativedelta(months = 1)
+        elif self.frequency == 'bimonthly':
+            duedate = first_duedate
+            while duedate <= enddate:
+                duedates.append(duedate)
+                duedate += relativedelta(months = 2)
+        elif self.frequency == 'quarterly':
+            duedate = first_duedate
+            while duedate <= enddate:
+                duedates.append(duedate)
+                duedate += relativedelta(months = 3)
+        elif self.frequency == 'semiannually':
+            duedate = first_duedate
+            while duedate <= enddate:
+                duedates.append(duedate)
+                duedate += relativedelta(months = 6)
+        elif self.frequency == 'yearly':
+            duedate = first_duedate
+            while duedate <= enddate:
+                duedates.append(duedate)
+                duedate += relativedelta(years = 1)
+        
+        # Find all the paydays within the date range
+        duedates = [duedate for duedate in duedates if duedate >= startdate and duedate <= enddate]
+
+        return duedates
+
+
+
+    # Calculate the amount spent on the bill object given the due dates
+    def amount_spent(self):
+        '''
+        This function calculates the amount of money spent on the bill object given the due dates.
+
+        Inputs:
+            None
 
         Returns:
             amount_spent (float): The amount of money spent on the bill object in the date range.
         '''
-        # Calculate the number of days in the date range
-        num_days = (enddate - startdate).days + 1
 
-        # Calculate the number of times the bill object has been paid in the date range for different types of frequencies
-        if self.frequency == 'weekly':
-            num_times_paid = math.floor(num_days / 7)
-        elif self.frequency == 'biweekly':
-            num_times_paid = math.floor(num_days / 14)
-        elif self.frequency == 'monthly':
-            num_times_paid = math.floor(num_days / 30)
-        elif self.frequency == 'bimonthly':
-            num_times_paid = math.floor(num_days / 60)
-        elif self.frequency == 'quarterly':
-            num_times_paid = math.floor(num_days / 90)
-        elif self.frequency == 'semiannually':
-            num_times_paid = math.floor(num_days / 180)
-        elif self.frequency == 'yearly':
-            num_times_paid = math.floor(num_days / 365)
-        else:
-            num_times_paid = 0
+        # Find the dates the bill is due
+        duedates = self.duedates()
 
-        # Calculate the amount of money spent on the bill object in the date range
-        amount_spent = num_times_paid * self.amount
+        # Find the amount spent on the bill
+        amount_spent = len(duedates) * self.amount
 
-        # Return the amount of money spent on the bill object in the date range
         return amount_spent
+        
 
 # Define the expense class
 class expense:
@@ -454,10 +509,6 @@ class income:
             amount_earned (float): The amount of money recieved from the income object in the date range.
         '''
 
-        startdate = self.startdate
-        enddate = self.enddate
-        payday = self.payday
-
         # Determine the dates of the paydays for a given frequency and date range
         paydays = self.paydays()
 
@@ -576,7 +627,7 @@ class account:
         # Iterate through each bill object in the account object
         for bill in self.bills:
             # Calculate the amount spent on the bill object in the date range
-            total_spent += bill.amount_spent(startdate, enddate)
+            total_spent += bill.amount_spent()
 
         # Return the total amount spent on bills in the date range
         return total_spent
@@ -651,7 +702,7 @@ class account:
         # Iterate through each bill object in the account object and determine the total amount spent on the bill object in the date range
         for bill in self.bills:
             # Calculate the amount spent on the bill object in the date range
-            amount_spent = bill.amount_spent(startdate, enddate)
+            amount_spent = bill.amount_spent()
 
             # Subtract the amount spent on the bill object in the date range from the account object's balance
             self.balance -= amount_spent
@@ -1097,8 +1148,7 @@ class budget:
         account_summary = ''
 
         # Apply the regular transfers to the account object
-        for transfer in self.transfers:
-            self.reaccuring_transfer()
+        self.reaccuring_transfer()
 
         # Iterate through each account object in the budget object and adjust the balances to account for the money spent and earned and the transfers
         for account in self.accounts:

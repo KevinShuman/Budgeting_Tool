@@ -19,24 +19,24 @@ args.enddate = dt.datetime.strptime(args.enddate, '%Y-%m-%d').date()
 # The income start date might be different for each income source, because of the start date is
 # the day the income is earn and related to the frequency of the income source.
 # Similarly is true for the transfer start date.
-startdate = dt.date(2023, 1, 1)
-enddate = dt.date(2023, 12, 31)
+startdate = args.startdate
+enddate = args.enddate
 
 # Create bills, expenses, and incomes
 
 # A bill has a name, amount, duedate, frequency, category, and ifweekday
 bills = [   
-            bl.bill(name="rent", amount=1000.00, duedate=1, frequency="monthly", category="housing", ifweekday=True),
-            bl.bill(name="phone", amount=79.99, duedate=1, frequency="monthly", category="utilities", ifweekday=True),
-            bl.bill(name="internet", amount=79.99, duedate=15, frequency="monthly", category="utilities", ifweekday=True),
-            bl.bill(name="car insurance", amount=94.99, duedate=21, frequency="monthly", category="car", ifweekday=True),
-            bl.bill(name="utilties", amount=114.99, duedate=1, frequency="monthly", category="utilities", ifweekday=True),
-            bl.bill(name="student loan", amount=500.00, duedate=1, frequency="weekly", category="debt", ifweekday=True),
-            bl.bill(name="health insurance", amount=116.00, duedate=1, frequency="monthly", category="health", ifweekday=True),
-            bl.bill(name="charity", amount=10.00, duedate=2, frequency="monthly", category="donations", ifweekday=True),
-            bl.bill(name="netflix", amount=14.99, duedate=20, frequency="monthly", category="entertainment", ifweekday=True),
-            bl.bill(name="spotify", amount=9.99, duedate=20, frequency="monthly", category="entertainment", ifweekday=True),
-            bl.bill(name="lightroom", amount=9.99, duedate=20, frequency="monthly", category="hobbies", ifweekday=True),
+            bl.bill(name="rent", amount=1000.00, duedate=1, frequency="monthly", startdate=startdate, enddate=enddate, category="housing", ifweekday=True),
+            bl.bill(name="phone", amount=79.99, duedate=1, frequency="monthly", startdate=startdate, enddate=enddate, category="utilities", ifweekday=True),
+            bl.bill(name="internet", amount=79.99, duedate=15, frequency="monthly", startdate=startdate, enddate=enddate, category="utilities", ifweekday=True),
+            bl.bill(name="car insurance", amount=94.99, duedate=21, frequency="monthly", startdate=startdate, enddate=enddate, category="car", ifweekday=True),
+            bl.bill(name="utilties", amount=114.99, duedate=1, frequency="monthly", startdate=startdate, enddate=enddate, category="utilities", ifweekday=True),
+            bl.bill(name="student loan", amount=500.00, duedate=1, frequency="weekly", startdate=startdate, enddate=enddate, category="debt", ifweekday=True),
+            bl.bill(name="health insurance", amount=116.00, duedate=1, frequency="monthly", startdate=startdate, enddate=enddate, category="health", ifweekday=True),
+            bl.bill(name="charity", amount=10.00, duedate=2, frequency="monthly", startdate=startdate, enddate=enddate, category="donations", ifweekday=True),
+            bl.bill(name="netflix", amount=14.99, duedate=20, frequency="monthly", startdate=startdate, enddate=enddate, category="entertainment", ifweekday=True),
+            bl.bill(name="spotify", amount=9.99, duedate=20, frequency="monthly", startdate=startdate, enddate=enddate, category="entertainment", ifweekday=True),
+            bl.bill(name="lightroom", amount=9.99, duedate=20, frequency="monthly", startdate=startdate, enddate=enddate, category="hobbies", ifweekday=True),
 ]
 
 # An expense has a name, amount, category, and description
