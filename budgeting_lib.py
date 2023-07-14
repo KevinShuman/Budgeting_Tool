@@ -161,8 +161,6 @@ class bill:
 
         return duedates
 
-
-
     # Calculate the amount spent on the bill object given the due dates
     def amount_spent(self):
         '''
@@ -183,6 +181,7 @@ class bill:
 
         return amount_spent
         
+
 
 # Define the expense class
 class expense:
@@ -347,6 +346,7 @@ class expense:
         return amount_spent
     
     
+
 # Define the income class
 class income:
     # Define the initialization function
@@ -516,6 +516,7 @@ class income:
         return amount_earned        
 
     
+
 # Define the account class
 class account:
     # Define the initialization function
@@ -744,7 +745,7 @@ class account:
             # Add the amount received from the income object in the date range to the account object's balance
             self.balance += amount_received
 
-    
+
     
 # Define transfer class
 class transfer:
@@ -1176,4 +1177,3 @@ class budget:
 
         # Returns the budget_summary string
         return budget_summary
-    
