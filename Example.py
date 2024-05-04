@@ -5,6 +5,9 @@ import budgeting_lib as bl
 import datetime as dt
 import argparse
 
+# Create an example of how to run the Example.py file in command line
+# python Example.py 2020-01-01 2020-12-31
+
 # Create command line argument
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('startdate', type=str, help='Start date of the budget')
