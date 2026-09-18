@@ -1,6 +1,8 @@
 import budgeting_lib as bl
 import datetime as dt
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 # Define a function that takes in a list of dates; lists of lists of bills, expenses, incomes, accounts, and transfers;
 # a list of budget objects; and creates a pandas dataframe of the budget objects' summaries
@@ -72,25 +74,15 @@ def summary_dataframe(dates, bills, expenses, incomes, accounts, transfers, budg
             # We need to create a list of accounts for each date in the date range using the dictionary information.
             accounts_list = []
             for j, account_dict in enumerate(account_list):
-                if counter == 0:
-                    # Check if the account is called "Checking"
-                    if account_dict['name'] == 'Checking':
-                        name = account_dict['name']
-                        # print(f'{name}: {j} {counter} {date}')
-                        accounts_list.append(bl.account(name=account_dict['name'], type=account_dict['type'], balance=initial_balances[j], bills=bills_list, expenses=expenses_list, incomes=incomes_list))
-                    else:
-                        # name = account_dict['name']
-                        # print(f'{name}: {j} {counter} {date}')
-                        accounts_list.append(bl.account(name=account_dict['name'], type=account_dict['type'], balance=initial_balances[j], bills=[], expenses=[], incomes=[]))
+                # Only the account of type "checking" (case-insensitive) accrues
+                # bills/expenses/incomes; this is keyed on type, not name, so
+                # renaming the account doesn't silently drop its tracking
+                is_checking = account_dict['type'].lower() == 'checking'
+                balance = initial_balances[j] if counter == 0 else final_balances[j + 3]
+                if is_checking:
+                    accounts_list.append(bl.account(name=account_dict['name'], type=account_dict['type'], balance=balance, bills=bills_list, expenses=expenses_list, incomes=incomes_list))
                 else:
-                    if account_dict['name'] == 'Checking':
-                        name = account_dict['name']
-                        # print(f'{name}: {j} {counter} {date}')
-                        accounts_list.append(bl.account(name=account_dict['name'], type=account_dict['type'], balance=final_balances[j+3], bills=bills_list, expenses=expenses_list, incomes=incomes_list))
-                    else:
-                        # name = account_dict['name']
-                        # print(f'{name}: {j} {counter} {date}')
-                        accounts_list.append(bl.account(name=account_dict['name'], type=account_dict['type'], balance=final_balances[j+3], bills=[], expenses=[], incomes=[]))
+                    accounts_list.append(bl.account(name=account_dict['name'], type=account_dict['type'], balance=balance, bills=[], expenses=[], incomes=[]))
 
             # Create the transfers list for the budget object
             # The parameter is a list of list of dictionaries, so the shape looks like [[{transfer1}, {transfer2}, ...], [{transfer1}, {transfer2}, ...], ...]
@@ -98,12 +90,20 @@ def summary_dataframe(dates, bills, expenses, incomes, accounts, transfers, budg
             # We need to create a list of transfers for each date in the date range using the dictionary information.
             transfers_list = []
             for transfer_dict in transfer_list:
-                # Find what from_account and to_account are in the accounts_list using the names in the transfer_dict
+                # Find what from_account and to_account are in the accounts_list using the names in the transfer_dict.
+                # Reset on each transfer so a typo'd account name raises a clear
+                # error instead of silently reusing the previous transfer's account.
+                from_account = None
+                to_account = None
                 for account in accounts_list:
                     if account.name == transfer_dict['from_account'].lower():
                         from_account = account
                     if account.name == transfer_dict['to_account'].lower():
                         to_account = account
+                if from_account is None:
+                    raise ValueError(f"Transfer '{transfer_dict['name']}': from_account '{transfer_dict['from_account']}' does not match any account name.")
+                if to_account is None:
+                    raise ValueError(f"Transfer '{transfer_dict['name']}': to_account '{transfer_dict['to_account']}' does not match any account name.")
                 transfers_list.append(bl.transfer(name=transfer_dict['name'], amount=transfer_dict['amount'], from_account=from_account, to_account=to_account, frequency=transfer_dict['frequency'], depositday=transfer_dict['depositday'], startdate=startdate, enddate=date))
 
             # Create the budget object
@@ -150,4 +150,52 @@ def summary_dataframe(dates, bills, expenses, incomes, accounts, transfers, budg
     # budget_summary = budget_summary.drop(columns=['Total Spent', 'Total Earned', 'Total Balance'])
 
     return budget_summary
+
+# Define a function that plots a budget summary dataframe, mirroring the plotting
+# code used across the My_Budget_*.py scripts, so both scripts and the GUI can share it
+def plot_summary(summary, title=None, fill_date=None, mean_column='checking Balance'):
+    '''
+    This function plots a budget summary dataframe and returns the resulting matplotlib figure.
+
+    Inputs:
+        summary (dataframe): The budget summary dataframe, as returned by summary_dataframe.
+                              Total Spent/Earned/Balance columns should already be dropped.
+        title (str): An optional title for the plot. Defaults to a date-range based title.
+        fill_date (date): An optional date to annotate each account's balance at, in addition
+                            to the final balance annotations that are always shown.
+        mean_column (str): The column to draw a mean reference line for, if present.
+
+    Returns:
+        fig (matplotlib.figure.Figure): The resulting figure.
+    '''
+
+    fig, ax = plt.subplots(figsize=(15, 11))
+
+    summary.plot(ax=ax)
+    ax.axhline(y=0, color='black', linestyle='--')
+
+    if mean_column in summary.columns:
+        mean_value = summary[mean_column].mean()
+        ax.axhline(y=mean_value, color='red', linestyle='--', label=f'Mean {mean_column}: ${mean_value:,.2f}')
+
+    ax.set_xlabel('Date', fontsize=18)
+    ax.set_ylabel('Balance', fontsize=18)
+    ax.tick_params(axis='both', labelsize=14)
+    ax.get_yaxis().set_major_formatter(ticker.FuncFormatter(lambda x, loc: "${:,}".format(int(x))))
+
+    if title is None:
+        title = f'Budget Plot: {summary.index[0]} to {summary.index[-1]}'
+    ax.set_title(title, fontsize=20)
+    ax.legend(loc='upper left', fontsize=18)
+
+    if fill_date is not None and fill_date in summary.index:
+        for account in summary.columns:
+            ax.text(fill_date, summary[account].loc[fill_date], '\n${:,.2f}\n\n'.format(summary[account].loc[fill_date]), fontsize=12, rotation=15)
+
+    for account in summary.columns:
+        ax.text(summary.index[-1], summary[account].iloc[-1], '${:,.2f}'.format(summary[account].iloc[-1]), fontsize=12, rotation=15)
+
+    fig.tight_layout()
+
+    return fig
 

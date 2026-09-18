@@ -5,6 +5,25 @@ import calendar
 from dateutil.relativedelta import relativedelta
 from datetime import timedelta
 
+# Number of months to advance for each supported monthly-family frequency
+_MONTHLY_FREQUENCY_STEPS = {'monthly': 1, 'bimonthly': 2, 'quarterly': 3, 'semiannually': 6, 'yearly': 12}
+
+
+def _month_offset_date(year, month, day, months_ahead):
+    '''
+    Returns the date `months_ahead` months after (year, month) with the given
+    day of month, clamped to the last valid day of the resulting month (e.g.
+    day=31 becomes day=30 in a 30-day month). Each call is computed fresh from
+    the original (year, month, day) rather than compounding off a previously
+    clamped date, so a day like 31 returns to the 31st in months that have one
+    instead of drifting permanently to a lower day after a shorter month.
+    '''
+    total_months = (month - 1) + months_ahead
+    result_year = year + total_months // 12
+    result_month = total_months % 12 + 1
+    last_day_of_month = calendar.monthrange(result_year, result_month)[1]
+    return dt.date(result_year, result_month, min(day, last_day_of_month))
+
 # Define the bill class
 class bill:
     '''
@@ -114,52 +133,41 @@ class bill:
         enddate = self.enddate
         duedate = self.duedate
 
-        # Find the first due date in the date range
-        first_duedate = dt.date(startdate.year, startdate.month, duedate)
+        # Clamp the due day to the last valid day of startdate's month (e.g. a
+        # due date of 31 becomes the 28th/29th/30th in a shorter month) without
+        # losing the original due day for later months that do have that many days
+        first_duedate = _month_offset_date(startdate.year, startdate.month, duedate, 0)
 
         # Find the dates of the due dates in the date range with the given frequency
         # and return them as a list
         duedates = []
         if self.frequency == 'weekly':
-            duedate = first_duedate
-            while duedate <= enddate:
-                duedates.append(duedate)
-                duedate += dt.timedelta(days = 7)
+            current = first_duedate
+            while current <= enddate:
+                duedates.append(current)
+                current += dt.timedelta(days = 7)
         elif self.frequency == 'biweekly':
-            duedate = first_duedate
-            while duedate <= enddate:
-                duedates.append(duedate)
-                duedate += dt.timedelta(days = 14)
-        elif self.frequency == 'monthly':
-            duedate = first_duedate
-            while duedate <= enddate:
-                duedates.append(duedate)
-                duedate += relativedelta(months = 1)
-        elif self.frequency == 'bimonthly':
-            duedate = first_duedate
-            while duedate <= enddate:
-                duedates.append(duedate)
-                duedate += relativedelta(months = 2)
-        elif self.frequency == 'quarterly':
-            duedate = first_duedate
-            while duedate <= enddate:
-                duedates.append(duedate)
-                duedate += relativedelta(months = 3)
-        elif self.frequency == 'semiannually':
-            duedate = first_duedate
-            while duedate <= enddate:
-                duedates.append(duedate)
-                duedate += relativedelta(months = 6)
-        elif self.frequency == 'yearly':
-            duedate = first_duedate
-            while duedate <= enddate:
-                duedates.append(duedate)
-                duedate += relativedelta(years = 1)
+            current = first_duedate
+            while current <= enddate:
+                duedates.append(current)
+                current += dt.timedelta(days = 14)
+        elif self.frequency in _MONTHLY_FREQUENCY_STEPS:
+            step = _MONTHLY_FREQUENCY_STEPS[self.frequency]
+            i = 0
+            current = first_duedate
+            while current <= enddate:
+                duedates.append(current)
+                i += 1
+                current = _month_offset_date(startdate.year, startdate.month, duedate, i * step)
+        elif self.frequency == 'once':
+            duedates.append(first_duedate)
+              
         
         # Find all the paydays within the date range
         duedates = [duedate for duedate in duedates if duedate >= startdate and duedate <= enddate]
 
         return duedates
+
 
     # Calculate the amount spent on the bill object given the due dates
     def amount_spent(self):
@@ -445,47 +453,32 @@ class income:
         enddate = self.enddate
         payday = self.payday
 
-        # Find the first payday in the date range
-        first_payday = dt.date(startdate.year, startdate.month, payday)
+        # Clamp the payday to the last valid day of startdate's month (e.g. a
+        # payday of 31 becomes the 28th/29th/30th in a shorter month) without
+        # losing the original payday for later months that do have that many days
+        first_payday = _month_offset_date(startdate.year, startdate.month, payday, 0)
 
         # Find the dates of the paydays in the date range with the given frequency
         # and return them as a list
         paydays = []
         if self.frequency == 'weekly':
-            payday = first_payday
-            while payday <= enddate:
-                paydays.append(payday)
-                payday += dt.timedelta(days = 7)
+            current = first_payday
+            while current <= enddate:
+                paydays.append(current)
+                current += dt.timedelta(days = 7)
         elif self.frequency == 'biweekly':
-            payday = first_payday
-            while payday <= enddate:
-                paydays.append(payday)
-                payday += dt.timedelta(days = 14)
-        elif self.frequency == 'monthly':
-            payday = first_payday
-            while payday <= enddate:
-                paydays.append(payday)
-                payday += relativedelta(months = 1)
-        elif self.frequency == 'bimonthly':
-            payday = first_payday
-            while payday <= enddate:
-                paydays.append(payday)
-                payday += relativedelta(months = 2)
-        elif self.frequency == 'quarterly':
-            payday = first_payday
-            while payday <= enddate:
-                paydays.append(payday)
-                payday += relativedelta(months = 3)
-        elif self.frequency == 'semiannually':
-            payday = first_payday
-            while payday <= enddate:
-                paydays.append(payday)
-                payday += relativedelta(months = 6)
-        elif self.frequency == 'yearly':
-            payday = first_payday
-            while payday <= enddate:
-                paydays.append(payday)
-                payday += relativedelta(years = 1)
+            current = first_payday
+            while current <= enddate:
+                paydays.append(current)
+                current += dt.timedelta(days = 14)
+        elif self.frequency in _MONTHLY_FREQUENCY_STEPS:
+            step = _MONTHLY_FREQUENCY_STEPS[self.frequency]
+            i = 0
+            current = first_payday
+            while current <= enddate:
+                paydays.append(current)
+                i += 1
+                current = _month_offset_date(startdate.year, startdate.month, payday, i * step)
         
         # Find all the paydays within the date range
         paydays = [payday for payday in paydays if payday >= startdate and payday <= enddate]
@@ -873,8 +866,11 @@ class transfer:
         # Initialize the deposit_days list
         deposit_days = []
 
-        # Find the first deposit day in the month of the start date
-        first_deposit_day = dt.date(startdate.year, startdate.month, depositday)
+        # Clamp the deposit day to the last valid day of startdate's month (e.g.
+        # a deposit day of 31 becomes the 28th/29th/30th in a shorter month)
+        # without losing the original deposit day for later months that do
+        # have that many days
+        first_deposit_day = _month_offset_date(startdate.year, startdate.month, depositday, 0)
 
         # Find the dates of the deposit days in the date range accounting for the 
         # frequency of the transfer object
@@ -888,31 +884,14 @@ class transfer:
             while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
                 deposited_day += dt.timedelta(days=14)
-        elif self.frequency == 'monthly':
+        elif self.frequency in _MONTHLY_FREQUENCY_STEPS:
+            step = _MONTHLY_FREQUENCY_STEPS[self.frequency]
+            i = 0
             deposited_day = first_deposit_day
             while deposited_day <= enddate:
                 deposit_days.append(deposited_day)
-                deposited_day += relativedelta(months=1)
-        elif self.frequency == 'bimonthly':
-            deposited_day = first_deposit_day
-            while deposited_day <= enddate:
-                deposit_days.append(deposited_day)
-                deposited_day += relativedelta(months=2)
-        elif self.frequency == 'quarterly':
-            deposited_day = first_deposit_day
-            while deposited_day <= enddate:
-                deposit_days.append(deposited_day)
-                deposited_day += relativedelta(months=3)
-        elif self.frequency == 'semiannually':
-            deposited_day = first_deposit_day
-            while deposited_day <= enddate:
-                deposit_days.append(deposited_day)
-                deposited_day += relativedelta(months=6)
-        elif self.frequency == 'yearly':
-            deposited_day = first_deposit_day
-            while deposited_day <= enddate:
-                deposit_days.append(deposited_day)
-                deposited_day += relativedelta(years=1)
+                i += 1
+                deposited_day = _month_offset_date(startdate.year, startdate.month, depositday, i * step)
 
         # Find which dates are in the date range
         deposit_days = [day for day in deposit_days if day >= startdate and day <= enddate]

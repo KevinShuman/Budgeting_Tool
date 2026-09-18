@@ -1,0 +1,38 @@
+{
+  "accounts": [
+    {"name": "Checking", "type": "checking", "initial_balance": 2500.00},
+    {"name": "Savings", "type": "savings", "initial_balance": 10000.00},
+    {"name": "Emergency Fund", "type": "savings", "initial_balance": 5000.00}
+  ],
+  "segments": [
+    {
+      "budget_name": "budget1",
+      "start": "2026-01-01",
+      "end": "2026-12-31",
+      "bills": [
+        {"name": "Rent", "amount": 1500, "category": "Subscription", "frequency": "Monthly", "duedate": 1, "ifweekday": false},
+        {"name": "Electricity", "amount": 80, "category": "Subscription", "frequency": "Monthly", "duedate": 15, "ifweekday": false},
+        {"name": "Internet", "amount": 60, "category": "Subscription", "frequency": "Monthly", "duedate": 20, "ifweekday": false},
+        {"name": "Phone", "amount": 45, "category": "Subscription", "frequency": "Monthly", "duedate": 10, "ifweekday": false},
+        {"name": "Car Insurance", "amount": 120, "category": "Subscription", "frequency": "Monthly", "duedate": 5, "ifweekday": true},
+        {"name": "Streaming Service", "amount": 15.99, "category": "Subscription", "frequency": "Monthly", "duedate": 12, "ifweekday": false},
+        {"name": "Gym Membership", "amount": 30, "category": "Subscription", "frequency": "Monthly", "duedate": 1, "ifweekday": false},
+        {"name": "Car Payment", "amount": 350, "category": "Subscription", "frequency": "Monthly", "duedate": 8, "ifweekday": true}
+      ],
+      "expenses": [
+        {"name": "Groceries", "amount": 350, "category": "Expense", "description": "Groceries for the month"},
+        {"name": "Gas", "amount": 100, "category": "Expense", "description": "Gas for the car"},
+        {"name": "Dining Out", "amount": 150, "category": "Expense", "description": "Restaurants and takeout"},
+        {"name": "Entertainment", "amount": 75, "category": "Expense", "description": "Movies, games, hobbies"}
+      ],
+      "incomes": [
+        {"name": "Paycheck", "amount": 2200, "payday": 1, "ifweekday": true, "category": "Income", "frequency": "Biweekly"},
+        {"name": "Paycheck", "amount": 2200, "payday": 15, "ifweekday": true, "category": "Income", "frequency": "Biweekly"}
+      ],
+      "transfers": [
+        {"name": "Checking to Savings", "amount": 300, "from_account": "Checking", "to_account": "Savings", "frequency": "monthly", "depositday": 1},
+        {"name": "Checking to Emergency Fund", "amount": 100, "from_account": "Checking", "to_account": "Emergency Fund", "frequency": "monthly", "depositday": 1}
+      ]
+    }
+  ]
+}
